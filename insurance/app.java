@@ -9,8 +9,10 @@
 import java.io.*;
 import java.util.*;
 
-/* interface for insurance database */
-public class application {
+/**
+ * User-interface for insurance database
+ */
+public class app {
     public static void menu() {
         System.out.println("implement interface");
     }
