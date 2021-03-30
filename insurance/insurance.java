@@ -1,5 +1,5 @@
 /**
- * Course: CSE341
+ * Course: CSE 341
  * Semester and Year: Spring 2021
  * Assignment: Database System
  * Author: Derei, Tal

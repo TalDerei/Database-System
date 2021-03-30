@@ -1,3 +1,11 @@
+/**
+ * Course: CSE 341
+ * Semester and Year: Spring 2021
+ * Assignment: Database System
+ * Author: Derei, Tal
+ * User ID: tad222
+ */
+
 import java.io.*;
 import java.util.*;
 
