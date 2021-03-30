@@ -1,2 +1,2 @@
-Main-class: stock
+Main-class: insurance
 Class-Path: ojdbc8.jar

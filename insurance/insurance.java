@@ -10,7 +10,7 @@ import java.util.*;
 import java.sql.*;
 import java.text.*;
 
-public class stock {
+public class insurance {
     public static void main(String[] args) {
         // input variables
         String user;
