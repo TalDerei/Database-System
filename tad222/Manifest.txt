@@ -1,0 +1,2 @@
+Main-class: stock
+Class-Path: ojdbc8.jar
