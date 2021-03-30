@@ -1,15 +1,26 @@
-/*
+/**
  * Course: CSE341
  * Semester and Year: Spring 2021
- * Assignment: JBDC with Oracle Database
+ * Assignment: Database System
  * Author: Derei, Tal
  * User ID: tad222
  */
 
-import java.util.*;
-import java.sql.*;
-import java.text.*;
+import java.util.Scanner;
+import java.sql.Connection;
+import java.sql.Statement;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.sql.ResultSet;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.util.ArrayList;
+import java.sql.SQLException;
 
+/**
+ * Insuance 
+ */
 public class insurance {
     public static void main(String[] args) {
         // input variables
