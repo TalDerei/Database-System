@@ -8,13 +8,15 @@
 
 import java.io.*;
 import java.util.*;
+import java.sql.*;
+import java.text.*;;
 
 /**
  * User-interface for insurance database
  */
 public class app {
-    public static void main() {
-        // input variables
+    public static void main(String[] args) {
+    // input variables
         String user;
         String pass;
         String start_date = "";
@@ -40,16 +42,16 @@ public class app {
             System.out.print("Enter start date in Oracle standard format (dd-MON-yy): ");
             while (valid_start_date) {
                 start_date = input.next();
-                valid_start_date = validateDate(start_date);
+                valid_start_date = new insurance().validateDate(start_date);
             }
             System.out.print("Enter end date in Oracle standard format (dd-MON-yy): ");
             while (valid_end_date) {
                 finish_date = input.next();   
-                valid_end_date = validateDate(finish_date); 
+                valid_end_date = new insurance().validateDate(finish_date); 
             }
 
             // execute connect_database method
-            connection_value = connect_database(user, pass, start_date, finish_date);
+            connection_value = new insurance().connect_database(user, pass, start_date, finish_date);
         }
     }
 }

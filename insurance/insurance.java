@@ -59,10 +59,10 @@ public class insurance {
     }
 
     // validateDate check's the validity of the user's start and finish dates
-    public static Boolean validateDate(String user_date) {
+    public static Boolean validateDate(String start_date) {
         DateFormat format = new SimpleDateFormat("dd-MMM-yy");
         try {
-            format.parse(user_date);
+            format.parse(start_date);
         } catch (ParseException e) {
             System.out.println("date invalid. Please try again!");
             return true;
