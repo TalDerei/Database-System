@@ -24,7 +24,7 @@ create table policy(
     policy_id varchar(5), 
     customer_id varchar(5),
     policy_type varchar(20),
-    policy_cost varchar(8) check (policy_cost > 0),
+    policy_cost numeric(8,2),
     coverage varchar(10),
     primary key (policy_id),
     foreign key (customer_id) references customer(customer_id) on delete set null);
@@ -73,8 +73,8 @@ create table claim(
     claim_id varchar(5), 
     customer_id varchar(5),
     claim_type varchar(20),
-    claim_payment numeric (8,2),
-    descriptions varchar(40),
+    claim_payment varchar (5),
+    description varchar(40),
     primary key (claim_id),
     foreign key (customer_id) references customer(customer_id) on delete set null);
 
@@ -89,7 +89,7 @@ create table item(
     claim_id varchar(5),
     policy_id varchar(5),
     item_type varchar(20),
-    descriptions varchar(20),
+    description varchar(20),
     primary key (item_id),
     foreign key (claim_id) references claim(claim_id) on delete set null,
     foreign key (policy_id) references policy(policy_id) on delete set null);
