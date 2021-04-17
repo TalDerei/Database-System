@@ -1,0 +1,2 @@
+Main-class: app
+Class-Path: ojdbc8.jar
