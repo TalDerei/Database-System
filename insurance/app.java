@@ -19,20 +19,20 @@ public class app {
          */
         String user;
         String pass;
-        boolean connection_status = true;
+        // boolean connection_status = true;
 
         /**
          * Connect to the database
          */
         Scanner input = new Scanner(System.in);
-        while (connection_status) {
+        // while (connection_status) {
             System.out.print("enter Oracle user id: ");   
             user = input.nextLine();
             System.out.print("enter Oracle password for " + user + ": ");
             pass = input.nextLine();
 
-            connection_status = new insurance().connect_database(user, pass);
-        }
+            Insurance database = Insurance.connect_database(user, pass);
+        // }
 
         /**
          * Connect to customer, agent, adjuster, or corperate interfaces
@@ -47,16 +47,20 @@ public class app {
             if (condition) {
                 interfaces = input.nextInt();
                 if (interfaces == 1) {
-                    new insurance().customer(interfaces);
+                    new Insurance().customer(database);
+                    break;
                 }
                 else if (interfaces == 2) {
-                    new insurance().agent(interfaces);
+                    new Insurance().agent(database);
+                    break;
                 }
                 else if (interfaces == 3) {
-                    new insurance().adjuster(interfaces);
+                    new Insurance().adjuster(database);
+                    break;
                 }
                 else if (interfaces == 4) {
-                    new insurance().corperate(interfaces);
+                   new Insurance().corperate(database);
+                   break;
                 }
             }
             else {
