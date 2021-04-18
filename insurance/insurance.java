@@ -24,7 +24,7 @@ import java.sql.*;
  * Insurance database for executing SQL queries using JBDC
  */
 public class Insurance {
-    private Connection connecting;
+    private Connection connect;
     private PreparedStatement createCustomer;
     private PreparedStatement addPolicy;
     private PreparedStatement dropPolicy;
@@ -38,7 +38,7 @@ public class Insurance {
         try (Connection connection = DriverManager.getConnection("jdbc:oracle:thin:@edgar1.cse.lehigh.edu:1521:cse241",user,pass);
         ) {
             System.out.println("Connection to the oracle database succeeded!\n");
-            database.connecting = connection;
+            database.connect = connection;
             customer_interface(database);        
         } catch (SQLException exception) {
             // exception.printStackTrace();
@@ -52,22 +52,46 @@ public class Insurance {
      * Command-line interface for customers
      */
     public static void customer_interface(Insurance database) {
-
+        /**
+         * Mene for customer interface
+         */
         System.out.println("[1] Create a new customer in the database\n");
         System.out.println("[2] Add a policy\n");
         System.out.println("[3] Drop a policy\n");
         System.out.println("[4] Make a claim\n");
         System.out.println("[5] Add/remove/replace a vehicle\n");
 
+
         try {
-            database.createCustomer = database.connecting.prepareStatement("INSERT INTO customer (CUSTOMER_ID, NAME, ADDRESS, AGE) VALUES (?,?,?,?)");
+            database.createCustomer = database.connect.prepareStatement("INSERT INTO customer (CUSTOMER_ID, NAME, ADDRESS, AGE, PHONE_NUMBER) VALUES (?,?,?,?,?)");
+            database.addPolicy = database.connect.prepareStatement("INSERT INTO policy (POLICY_ID, CUSTOMER_ID, POLICY_TYPE, COVERAGE, POLICY_COST) VALUES (?, ?, ?, ?, ?) WHERE CUSTOMER_ID = ?");
+            database.dropPolicy = database.connect.prepareStatement("DELETE FROM policy WHERE POLICY_ID = ?");
+            database.makeClaim = database.connect.prepareStatement("INSERT INTO claim (CLAIM_ID, CUSTOMER_ID, DESCRIPTION, CLAIM_TYPE, CLAIM_PAYMENT) VALUES (?, ?, ?, ?, ?)");
         }
         catch (SQLException exception) {
-            // exception.printStackTrace();
-            System.out.println("woops!");
+            System.out.println("Error with Prepared Statements!");
         }
 
-        int success = database.insertCustomer("12345", "hello", "oliver", "23");
+        String customer_id;
+        String name;
+        String address;
+        String age;
+        String phone_number;
+
+        Scanner input = new Scanner(System.in);
+        System.out.print("enter customer_id: \n");   
+        customer_id = input.nextLine();
+        System.out.print("enter name: \n");
+        name = input.nextLine();
+        System.out.print("enter address: \n");   
+        address = input.nextLine();
+        System.out.print("enter age: \n");
+        age = input.nextLine();
+        System.out.print("enter phone number: \n");
+        phone_number = input.nextLine();
+
+        int success = database.insertCustomer(customer_id, name, address, age, phone_number);
+        System.out.print("success value is: " + success);
 
         // try {
         //     PreparedStatement ps = database.connecting.prepareStatement("SELECT * from employee");
@@ -115,19 +139,20 @@ public class Insurance {
         System.out.println("[4] Generate report on profitability of a customer\n");
     }
 
-    public int insertCustomer(String customer_id, String name, String address, String age) {
+    public int insertCustomer(String customer_id, String name, String address, String age, String phone_number) {
         int success = 0;
         try {
             createCustomer.setString(1, customer_id);
             createCustomer.setString(2, name);
             createCustomer.setString(3, address);
             createCustomer.setString(4, age);
+            createCustomer.setString(5, phone_number);
             success = createCustomer.executeUpdate();
         }
         catch (SQLException exception) {
-            System.out.println("Error!");
-            exception.printStackTrace();
+            System.out.println("invalid input!");
         }
         return success;
     }
 }
+

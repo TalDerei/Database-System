@@ -12,7 +12,7 @@ import java.util.Scanner;
 /**
  * User-interface for insurance database
  */
-public class app {
+public class application {
     public static void main(String[] args) {
         /**
          * User database login credentials -- username and password
@@ -26,12 +26,12 @@ public class app {
          */
         Scanner input = new Scanner(System.in);
         // while (connection_status) {
-            System.out.print("enter Oracle user id: ");   
-            user = input.nextLine();
-            System.out.print("enter Oracle password for " + user + ": ");
-            pass = input.nextLine();
+            // System.out.print("enter Oracle user id: ");   
+            // user = input.nextLine();
+            // System.out.print("enter Oracle password for " + user + ": ");
+            // pass = input.nextLine();
 
-            Insurance database = Insurance.connect_database(user, pass);
+            Insurance database = Insurance.connect_database("tad222", "sailcreator1");
         // }
 
         /**
