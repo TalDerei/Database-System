@@ -37,37 +37,37 @@ public class app {
         /**
          * Connect to customer, agent, adjuster, or corperate interfaces
          */
-        System.out.println("Enter [1] customer\n");
-        System.out.println("Enter [2] agent\n");
-        System.out.println("Enter [3] adjuster\n");
-        System.out.println("Enter [4] corporate management\n");
-        int interfaces;
-        while (true) {
-            boolean condition = input.hasNextInt();
-            if (condition) {
-                interfaces = input.nextInt();
-                if (interfaces == 1) {
-                    new Insurance().customer(database);
-                    break;
-                }
-                else if (interfaces == 2) {
-                    new Insurance().agent(database);
-                    break;
-                }
-                else if (interfaces == 3) {
-                    new Insurance().adjuster(database);
-                    break;
-                }
-                else if (interfaces == 4) {
-                   new Insurance().corperate(database);
-                   break;
-                }
-            }
-            else {
-                System.out.println("invalid input! Try again!");
-                input.next();
-            }
-        }
+        // System.out.println("Enter [1] customer\n");
+        // System.out.println("Enter [2] agent\n");
+        // System.out.println("Enter [3] adjuster\n");
+        // System.out.println("Enter [4] corporate management\n");
+        // int interfaces;
+        // while (true) {
+        //     boolean condition = input.hasNextInt();
+        //     if (condition) {
+        //         interfaces = input.nextInt();
+        //         if (interfaces == 1) {
+        //             new Insurance().customer(database);
+        //             break;
+        //         }
+        //         else if (interfaces == 2) {
+        //             new Insurance().agent(database);
+        //             break;
+        //         }
+        //         else if (interfaces == 3) {
+        //             new Insurance().adjuster(database);
+        //             break;
+        //         }
+        //         else if (interfaces == 4) {
+        //            new Insurance().corperate(database);
+        //            break;
+        //         }
+        //     }
+        //     else {
+        //         System.out.println("invalid input! Try again!");
+        //         input.next();
+        //     }
+        // }
     }
 }
 
