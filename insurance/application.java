@@ -12,7 +12,7 @@ import java.util.Scanner;
 /**
  * User-interface for insurance database
  */
-public class application {
+public class Application {
     public static void main(String[] args) {
         /**
          * User database login credentials -- username and password
@@ -68,6 +68,7 @@ public class application {
         //         input.next();
         //     }
         // }
+        // input.close();
     }
 }
 
