@@ -1,2 +1,2 @@
 # Database-System
-Creating a custom database system with JDBC
+Custom database system with JDBC API. 

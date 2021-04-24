@@ -376,6 +376,8 @@ public class Insurance {
     // on delete cascade: If a user is deleted, what should be deleted as well? policy, claim
     // add life insurance and disabilty insurance to Schema and ER Diagram
     // constraints check to schema
+    // add dependants table
+    // add other fields to ER diagram specified in schema
 
 // better message statements for user input
 // for entering cusomer policy, can have fixed customer policy rates for simplified db
@@ -397,9 +399,19 @@ public class Insurance {
 // customer files a claim
 // start readme tonight with assumptions and clarifications made
 // add claim accidents
+// add foreign keys
+policy_payment(payment_amount) references cost in policy
+claim_payment(payment_amount) references cost in claim
+
 
 // No one can be sure what losses they may suffer – not everyone's risk will be the same. ... Because of this, insurance premiums will vary from person to person because insurers try to make sure that each policyholder pays a premium that reflects their own particular level of risk.
 // print customer_id, policy_id, claim_id!
 // In a standard homeowners insurance policy, you have coverage for both Personal Liability and Personal Property.
 // https://www.youngalfred.com/homeowners-insurance/whats-the-difference-between-personal-liability-and-personal-property-claims
 // simplification: only one beneficiary
+// policy cost = 500 - 5000
+// claim payouts 100 - 100,000
+
+
+// Limitations
+    // can only add dependants at the beggining in policy creation
