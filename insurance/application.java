@@ -37,10 +37,10 @@ public class Application {
         /**
          * Connect to customer, agent, adjuster, or corperate interfaces
          */
-        // System.out.println("Enter [1] customer\n");
-        // System.out.println("Enter [2] agent\n");
-        // System.out.println("Enter [3] adjuster\n");
-        // System.out.println("Enter [4] corporate management\n");
+        // System.out.println("[1] Customer Interface\n");
+        // System.out.println("[2] Agent Interface\n");
+        // System.out.println("[3] Adjuster Interface\n");
+        // System.out.println("[4] Corporate Management Interface\n");
         // int interfaces;
         // while (true) {
         //     boolean condition = input.hasNextInt();
@@ -71,5 +71,6 @@ public class Application {
         // input.close();
     }
 }
+
 
 

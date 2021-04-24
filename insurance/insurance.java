@@ -359,13 +359,47 @@ public class Insurance {
         input.close();
         return "0";
     }
+
+    public static String policy_cost(String message) {
+        return "";
+    }
 }
 
-// there's some discrepencies between ER diagram and schema in terms of the fields
-// refactor database schema in oracle and repopulate fields with sample data
+    // refactor schema names
+        //add card name! e.g. visa
+        //define amounts for different types of policies
+    // find way to easily adjust database to change the fields accordingly 
+    // need to fix ach_transfer table. Can't delete tables -- https://www.w3schools.com/sql/sql_alter.asp
+    // there's some discrepencies between ER diagram and schema in terms of the fields
+    // refactor database schema in oracle and repopulate fields with sample data
+    // What about cascading changes to database, like a customer name changes?
+    // on delete cascade: If a user is deleted, what should be deleted as well? policy, claim
+    // add life insurance and disabilty insurance to Schema and ER Diagram
+    // constraints check to schema
+
+// better message statements for user input
+// for entering cusomer policy, can have fixed customer policy rates for simplified db
+// IDs generated server side
+// customer can change the payments to anything they want when adding a policy and payment********
 // make enter statements more detailed
 // catch exceptions on bad sql statements
 // way to differentiate in functions whether user entered invalid input or something already exist in database
 // executeUpdate() vs executeQuery() vs execute() commands
 // potential UI for CLI?
-// What about cascading changes to database, like a customer name changes?
+// link github in the README
+// https://blog.developer.atlassian.com/10-design-principles-for-delightful-clis/
+// agents can alter customer's policy's
+// function to create random 5 digit int
+// after doing these 3 insurance types, consider adding other insurances
+// need to tackling adding existing family members/friends to an insurance policy
+// concept of existing or new user in customer interface?
+// insurance can be:  life insurance: term life, whole life and universal life.
+// customer files a claim
+// start readme tonight with assumptions and clarifications made
+// add claim accidents
+
+// No one can be sure what losses they may suffer – not everyone's risk will be the same. ... Because of this, insurance premiums will vary from person to person because insurers try to make sure that each policyholder pays a premium that reflects their own particular level of risk.
+// print customer_id, policy_id, claim_id!
+// In a standard homeowners insurance policy, you have coverage for both Personal Liability and Personal Property.
+// https://www.youngalfred.com/homeowners-insurance/whats-the-difference-between-personal-liability-and-personal-property-claims
+// simplification: only one beneficiary
