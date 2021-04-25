@@ -7,12 +7,11 @@
  */
 
 import java.util.Scanner;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.ArrayList;
-import java.sql.ResultSet;
+import java.util.*;
+import java.text.*;
+import java.sql.*;
+import java.sql.Date;
 
 /**
  * Insurance database for executing SQL queries using JBDC
@@ -28,6 +27,7 @@ public class Insurance {
     private PreparedStatement addClaim;
     private PreparedStatement addVehicle;
     private PreparedStatement makePayment;
+    private PreparedStatement checkCustomerID;
 
     /**
      * Establish a connection to the Oracle database
@@ -40,7 +40,7 @@ public class Insurance {
             database.connect = connection;
             customer_interface(database);        
         } catch (SQLException exception) {
-            // exception.printStackTrace();
+            exception.printStackTrace();
             System.out.println("connection to the oracle database failed! Try again!");
             return null;
         }
@@ -52,40 +52,111 @@ public class Insurance {
      */
     public static void customer_interface(Insurance database) {
         /**
+         * Prepared Statements for customer interface
+         */
+        try {
+            database.createCustomer = database.connect.prepareStatement("INSERT INTO customer (CUSTOMER_ID, NAME, SOCIAL_SECURITY, EMAIL, ZIP_CODE, CITY, STATE, ADDRESS, DATE_OF_BIRTH, PHONE_NUMBER) VALUES (?,?,?,?,?,?,?,?,?,?)");
+            database.addPolicy = database.connect.prepareStatement("INSERT INTO policy NATURAL JOIN home_insurance (POLICY_ID, CUSTOMER_ID, POLICY_TYPE, COVERAGE, POLICY_COST, CITY, STATE, ZIP_CODE, ADDRESS, YEAR_BUILT, CONDITION, SQUARE_FOOT, LOT_SIZE, CREDIT_SCORE, MORTGAGE_PAYMENT, MARKET_VALUE, PERSONAL_PROPERTY_REPLACEMENT) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) WHERE CUSTOMER_ID = ?");
+            database.dropPolicy = database.connect.prepareStatement("DELETE FROM policy WHERE POLICY_ID = ?");
+            database.addClaim = database.connect.prepareStatement("INSERT INTO claim (CLAIM_ID, CUSTOMER_ID, DESCRIPTION, CLAIM_TYPE, CLAIM_PAYMENT) VALUES (?, ?, ?, ?, ?)");
+            database.addVehicle = database.connect.prepareStatement("INSERT INTO auto_insurance (POLICY_ID, YEAR, MAKE, MODEL, VIN_NUMBER, MARKET_VALUE, AGE, GENDER, GEOGRAPHIC_LOCATION, CREDIT_HISTORY, DRIVING_RECORD, ANNUAL_MILES) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            database.checkCustomerID = database.connect.prepareStatement("SELECT customer_id FROM customer WHERE customer_id = ?");
+            // database.makePayment = database.connect.prepareStatement("INSERT INTO auto_insurance (POLICY_ID, YEAR, MAKE, MODEL, VIN_NUMBER, MARKET_VALUE, AGE, GENDER, GEOGRAPHIC_LOCATION, CREDIT_HISTORY, DRIVING_RECORD, ANNUAL_MILES) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        }
+        catch (SQLException exception) {
+            System.out.println("Error with Prepared Statements!");
+            exception.printStackTrace();
+        }
+        /**
          * Command-line interface for customer interface
          */
-        System.out.println("[1] Create a new customer in the database\n");
+        System.out.println("[1] Create a new customer\n");
         System.out.println("[2] Add a policy\n");
         System.out.println("[3] Drop a policy\n");
         System.out.println("[4] Make a claim\n");
         System.out.println("[5] Add/remove/replace a vehicle\n");
 
+        //             query for policy type 
+        //                 natural join policy with policy type
+        //         else 
+        //             prompt user to renter customer_id or create new customer
+                
+
         Scanner input = new Scanner(System.in);
         int menue_selection;
         int success; 
+        String date_of_birth = "";
+        boolean valid_start_date = true;
         while (true) {
             boolean condition = input.hasNextInt();
             if (condition) {
                 menue_selection = input.nextInt();
                 if (menue_selection == 1) {
-                    String customer_id = user_string("customer_id");
+                    int customer_id = user_integer("customer_id");
                     String name = user_string("name");
+                    int social_security = user_integer("social_security");
+                    System.out.print("Enter start date in Oracle standard format (yyyy-mm-dd): ");
+                    while (valid_start_date) {
+                        date_of_birth = input.next();
+                        valid_start_date = validateDate(date_of_birth);
+                    } 
+                    String email = user_string("email");
+                    int zip_code = user_integer("zip_code");
+                    String city = user_string("city");
+                    String state = user_string("state");
                     String address = user_string("address");
-                    String age = user_string("age");
-                    String phone_number = user_string("phone_number");
-                    success = database.insertCustomer(customer_id, name, address, age, phone_number);
+                    long phone_number = user_integer("phone_number");
+                    success = database.insertCustomer(customer_id, name, social_security, email, zip_code, city, state, address, date_of_birth, phone_number);
                     System.out.print("success value is: " + success);
                     break;
                 }
                 else if (menue_selection == 2) {
-                    String policy_id = user_string("policy_id");
-                    String customer_id = user_string("customer_id");
-                    String policy_type = user_string("policy_type");
-                    String coverage = user_string("coverage");
-                    String policy_cost = user_string("policy_cost");
-                    success = database.insertPolicy(policy_id, customer_id, policy_type, coverage, policy_cost);
+                    int customer_id = user_integer("customer_id");
+                    success = database.getCustomerID(customer_id);
                     System.out.print("success value is: " + success);
-                    break;
+                    System.out.print("\n");
+                    if (customer_id == success) {
+                        while (true) {
+                            System.out.println("Select an insurance policy from the list below: \n");
+                            System.out.println("[1] Home Insurance\n");
+                            System.out.println("[2] Auto Insurance\n");
+                            System.out.println("[3] Health Insurance\n");
+                            System.out.println("[4] Life Insurance\n");
+                            condition = input.hasNextInt();
+                            if (condition) {
+                                menue_selection = input.nextInt();
+                                if (menue_selection == 1) {
+                                    System.out.print("Policy 1\n");
+                                    break;
+                                }
+                                else if (menue_selection == 2) {
+                                    System.out.print("Policy 3\n");
+                                    break;
+                                }
+                                else if (menue_selection == 3) {
+                                    System.out.print("Policy 2\n");
+                                    break;
+                                }
+                                else if (menue_selection == 4) {
+                                    System.out.print("Policy 4\n");
+                                    break;
+                                }
+                                else {
+                                    System.out.println("invalid input! Try again!");
+                                    input.next();
+                                }
+                            }
+                        }
+                    }
+
+                    // String policy_id = user_string("policy_id");
+                    // String customer_id = user_string("customer_id");
+                    // String policy_type = user_string("policy_type");
+                    // String coverage = user_string("coverage");
+                    // String policy_cost = user_string("policy_cost");
+                    // success = database.insertPolicy(policy_id, customer_id, policy_type, coverage, policy_cost);
+                    // System.out.print("success value is: " + success);
+                    // break;
                 }
                 else if (menue_selection == 3) {
                     String policy_id = user_string("policy_id");
@@ -110,39 +181,20 @@ public class Insurance {
                     String model = user_string("model");
                     String vin_number = user_string("vin_number");
                     String market_value = user_string("market_value");
-                    String age = user_string("age");
                     String gender = user_string("gender");
                     String geographic_location = user_string("geographic_location");
                     String credit_history = user_string("credit_history");
                     String driving_record = user_string("driving_record");
                     String annual_miles = user_string("annual_miles");
-                    success = database.insertAutoInsurance(policy_id, year, make, model, vin_number, market_value, age, gender, geographic_location, credit_history, driving_record, annual_miles);
+                    success = database.insertAutoInsurance(policy_id, year, make, model, vin_number, market_value, date_of_birth, gender, geographic_location, credit_history, driving_record, annual_miles);
                     System.out.print("success value is: " + success);
                     break;
                 }
-                
-                
             }
             else {
                 System.out.println("invalid input! Try again!");
                 input.next();
             }
-
-
-        /**
-         * Prepared Statements for customer interface
-         */
-        try {
-            database.createCustomer = database.connect.prepareStatement("INSERT INTO customer (CUSTOMER_ID, NAME, ADDRESS, AGE, PHONE_NUMBER) VALUES (?,?,?,?,?)");
-            database.addPolicy = database.connect.prepareStatement("INSERT INTO policy (POLICY_ID, CUSTOMER_ID, POLICY_TYPE, COVERAGE, POLICY_COST) VALUES (?, ?, ?, ?, ?) WHERE CUSTOMER_ID = ?");
-            database.dropPolicy = database.connect.prepareStatement("DELETE FROM policy WHERE POLICY_ID = ?");
-            database.addClaim = database.connect.prepareStatement("INSERT INTO claim (CLAIM_ID, CUSTOMER_ID, DESCRIPTION, CLAIM_TYPE, CLAIM_PAYMENT) VALUES (?, ?, ?, ?, ?)");
-            database.addVehicle = database.connect.prepareStatement("INSERT INTO auto_insurance (POLICY_ID, YEAR, MAKE, MODEL, VIN_NUMBER, MARKET_VALUE, AGE, GENDER, GEOGRAPHIC_LOCATION, CREDIT_HISTORY, DRIVING_RECORD, ANNUAL_MILES) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            // database.makePayment = database.connect.prepareStatement("INSERT INTO auto_insurance (POLICY_ID, YEAR, MAKE, MODEL, VIN_NUMBER, MARKET_VALUE, AGE, GENDER, GEOGRAPHIC_LOCATION, CREDIT_HISTORY, DRIVING_RECORD, ANNUAL_MILES) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        }
-        catch (SQLException exception) {
-            System.out.println("Error with Prepared Statements!");
-        }
     }
 }
 
@@ -214,18 +266,24 @@ public class Insurance {
     /**
      * Function for inserting new customers into the database
      */
-    public int insertCustomer(String customer_id, String name, String address, String age, String phone_number) {
+    public int insertCustomer(int customer_id, String name, int social_security, String email, int zip_code, String city, String state, String address, String date_of_birth, long phone_number) {
         int success = 0;
         try {
-            createCustomer.setString(1, customer_id);
+            createCustomer.setInt(1, customer_id);
             createCustomer.setString(2, name);
-            createCustomer.setString(3, address);
-            createCustomer.setString(4, age);
-            createCustomer.setString(5, phone_number);
+            createCustomer.setInt(3, social_security);
+            createCustomer.setString(4, email);
+            createCustomer.setInt(5, zip_code);
+            createCustomer.setString(6, city);
+            createCustomer.setString(7, state);
+            createCustomer.setString(8, address);
+            createCustomer.setDate(9, Date.valueOf(date_of_birth));
+            createCustomer.setLong(10, phone_number);
             success = createCustomer.executeUpdate();
         }
         catch (SQLException exception) {
             System.out.println("invalid input!");
+            exception.printStackTrace();
         }
         return success;
     }
@@ -236,11 +294,11 @@ public class Insurance {
     public int insertPolicy(String policy_id, String customer_id, String policy_type, String coverage, String policy_cost) {
         int success = 0;
         try {
-            createCustomer.setString(1, policy_id);
-            createCustomer.setString(2, customer_id);
-            createCustomer.setString(3, policy_type);
-            createCustomer.setString(4, coverage);
-            createCustomer.setString(5, policy_cost);
+            addPolicy.setString(1, policy_id);
+            addPolicy.setString(2, customer_id);
+            addPolicy.setString(3, policy_type);
+            addPolicy.setString(4, coverage);
+            addPolicy.setString(5, policy_cost);
             success = addPolicy.executeUpdate();
         }
         catch (SQLException exception) {
@@ -255,7 +313,7 @@ public class Insurance {
     public int deletePolicy(String policy_id) {
         int success = 0;
         try {
-            createCustomer.setString(1, policy_id);
+            dropPolicy.setString(1, policy_id);
             success = dropPolicy.executeUpdate();
         }
         catch (SQLException exception) {
@@ -270,11 +328,11 @@ public class Insurance {
     public int insertClaim(String claim_id, String customer_id, String description, String claim_type, String claim_payment) {
         int success = 0;
         try {
-            createCustomer.setString(1, claim_id);
-            createCustomer.setString(2, customer_id);
-            createCustomer.setString(3, description);
-            createCustomer.setString(4, claim_type);
-            createCustomer.setString(5, claim_payment);
+            addClaim.setString(1, claim_id);
+            addClaim.setString(2, customer_id);
+            addClaim.setString(3, description);
+            addClaim.setString(4, claim_type);
+            addClaim.setString(5, claim_payment);
             success = addClaim.executeUpdate();
         }
         catch (SQLException exception) {
@@ -286,21 +344,21 @@ public class Insurance {
     /**
      * Function for inserting new customer vehicle (auto insurance) into the database
      */
-    public int insertAutoInsurance(String policy_id, String year, String make, String model, String vin_number, String market_value, String age, String gender, String geographic_location, String credit_history, String driving_record, String annual_miles) {
+    public int insertAutoInsurance(String policy_id, String year, String make, String model, String vin_number, String market_value, String date_of_birth, String gender, String geographic_location, String credit_history, String driving_record, String annual_miles) {
         int success = 0;
         try {
-            createCustomer.setString(1, policy_id);
-            createCustomer.setString(2, year);
-            createCustomer.setString(3, make);
-            createCustomer.setString(4, model);
-            createCustomer.setString(5, vin_number);
-            createCustomer.setString(6, market_value);
-            createCustomer.setString(7, age);
-            createCustomer.setString(8, gender);
-            createCustomer.setString(9, geographic_location);
-            createCustomer.setString(10, credit_history);
-            createCustomer.setString(11, driving_record);
-            createCustomer.setString(12, annual_miles);
+            addVehicle.setString(1, policy_id);
+            addVehicle.setString(2, year);
+            addVehicle.setString(3, make);
+            addVehicle.setString(4, model);
+            addVehicle.setString(5, vin_number);
+            addVehicle.setString(6, market_value);
+            addVehicle.setString(7, date_of_birth);
+            addVehicle.setString(8, gender);
+            addVehicle.setString(9, geographic_location);
+            addVehicle.setString(10, credit_history);
+            addVehicle.setString(11, driving_record);
+            addVehicle.setString(12, annual_miles);
             success = addVehicle.executeUpdate();
         }
         catch (SQLException exception) {
@@ -344,6 +402,7 @@ public class Insurance {
         boolean conditional = true;
         while (conditional) {
             boolean condition = input.hasNextInt();
+            System.out.println("condition is: " + conditional);
             if (!condition) {
                 String user_input = input.nextLine();
                 System.out.println("entered string!");
@@ -360,28 +419,55 @@ public class Insurance {
         return "0";
     }
 
+    /**
+     * validateDate check's the validity of the user's start and finish dates
+     */
+    public static Boolean validateDate(String date_of_birth) {
+    DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+    try {
+        format.parse(date_of_birth);
+    } catch (ParseException e) {
+        System.out.println("date invalid. Please try again!");
+        return true;
+    }
+    return false;
+}
+
     public static String policy_cost(String message) {
         return "";
     }
+
+    /**
+     * getCustomerID checks if customer id is in the database when user attempts to add a policy
+     */
+    public int getCustomerID(int customer_id) {
+        int success = 0;
+        try {
+            checkCustomerID.setInt(1, customer_id);
+            ResultSet resultset = checkCustomerID.executeQuery();
+            while (resultset.next()) {
+                success = resultset.getInt("customer_id");
+                System.out.println("customer_id is: " + success);
+            }
+            try {
+                resultset.close();
+            }
+            catch (SQLException exception) {
+                System.out.println("Cannot close resultset!");
+            }
+        }
+        catch (SQLException exception) {
+            System.out.println("Customer_id invalid! No customer exists!!");
+        }
+        return success;
+    }
 }
 
-    // refactor schema names
-        //add card name! e.g. visa
-        //define amounts for different types of policies
-    // find way to easily adjust database to change the fields accordingly 
-    // need to fix ach_transfer table. Can't delete tables -- https://www.w3schools.com/sql/sql_alter.asp
-    // there's some discrepencies between ER diagram and schema in terms of the fields
-    // refactor database schema in oracle and repopulate fields with sample data
-    // What about cascading changes to database, like a customer name changes?
-    // on delete cascade: If a user is deleted, what should be deleted as well? policy, claim
-    // add life insurance and disabilty insurance to Schema and ER Diagram
-    // constraints check to schema
-    // add dependants table
-    // add other fields to ER diagram specified in schema
+// customer policy: 
+    // for entering cusomer policy, can have fixed customer policy rates for simplified db
+    // IDs generated server side
 
 // better message statements for user input
-// for entering cusomer policy, can have fixed customer policy rates for simplified db
-// IDs generated server side
 // customer can change the payments to anything they want when adding a policy and payment********
 // make enter statements more detailed
 // catch exceptions on bad sql statements
@@ -392,17 +478,12 @@ public class Insurance {
 // https://blog.developer.atlassian.com/10-design-principles-for-delightful-clis/
 // agents can alter customer's policy's
 // function to create random 5 digit int
-// after doing these 3 insurance types, consider adding other insurances
 // need to tackling adding existing family members/friends to an insurance policy
 // concept of existing or new user in customer interface?
 // insurance can be:  life insurance: term life, whole life and universal life.
-// customer files a claim
-// start readme tonight with assumptions and clarifications made
-// add claim accidents
-// add foreign keys
-policy_payment(payment_amount) references cost in policy
-claim_payment(payment_amount) references cost in claim
-
+// start readme with assumptions and clarifications made
+// add foreign keys: policy_payment(payment_amount) references cost in policy + claim_payment(payment_amount) references cost in claim
+// add dependants table
 
 // No one can be sure what losses they may suffer – not everyone's risk will be the same. ... Because of this, insurance premiums will vary from person to person because insurers try to make sure that each policyholder pays a premium that reflects their own particular level of risk.
 // print customer_id, policy_id, claim_id!

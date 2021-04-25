@@ -30,7 +30,6 @@ public class Application {
             // user = input.nextLine();
             // System.out.print("enter Oracle password for " + user + ": ");
             // pass = input.nextLine();
-
             Insurance database = Insurance.connect_database("tad222", "sailcreator1");
         // }
 
