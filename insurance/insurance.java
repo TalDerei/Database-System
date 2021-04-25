@@ -23,6 +23,7 @@ public class Insurance {
     private Connection connect;
     private PreparedStatement createCustomer;
     private PreparedStatement addPolicy;
+    private PreparedStatement addHomeInsurance;
     private PreparedStatement dropPolicy;
     private PreparedStatement addClaim;
     private PreparedStatement addVehicle;
@@ -55,8 +56,9 @@ public class Insurance {
          * Prepared Statements for customer interface
          */
         try {
-            database.createCustomer = database.connect.prepareStatement("INSERT INTO customer (CUSTOMER_ID, NAME, SOCIAL_SECURITY, EMAIL, ZIP_CODE, CITY, STATE, ADDRESS, DATE_OF_BIRTH, PHONE_NUMBER) VALUES (?,?,?,?,?,?,?,?,?,?)");
-            database.addPolicy = database.connect.prepareStatement("INSERT INTO policy NATURAL JOIN home_insurance (POLICY_ID, CUSTOMER_ID, POLICY_TYPE, COVERAGE, POLICY_COST, CITY, STATE, ZIP_CODE, ADDRESS, YEAR_BUILT, CONDITION, SQUARE_FOOT, LOT_SIZE, CREDIT_SCORE, MORTGAGE_PAYMENT, MARKET_VALUE, PERSONAL_PROPERTY_REPLACEMENT) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) WHERE CUSTOMER_ID = ?");
+            database.createCustomer = database.connect.prepareStatement("INSERT INTO customer (CUSTOMER_ID, NAME, SOCIAL_SECURITY, EMAIL, ZIP_CODE, CITY, STATE, ADDRESS, PHONE_NUMBER, DATE_OF_BIRTH) VALUES (?,?,?,?,?,?,?,?,?,?)");
+            database.addPolicy = database.connect.prepareStatement("INSERT INTO policy (CUSTOMER_ID, POLICY_ID, TYPE, COST, COVERAGE, DEDUCTIBLE, COINSURANCE, EFFECTIVE_DATE, EXPIRE_DATE, PLAN) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            database.addHomeInsurance = database.connect.prepareStatement("INSERT INTO home_insurance (POLICY_ID, CITY, STATE, ZIP_CODE, ADDRESS, YEAR_BUILT, CONDITION, SQUARE_FOOT, LOT_SIZE, CREDIT_SCORE, MORTGAGE_PAYMENT, MARKET_VALUE, PERSONAL_PROPERTY_REPLACEMENT) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             database.dropPolicy = database.connect.prepareStatement("DELETE FROM policy WHERE POLICY_ID = ?");
             database.addClaim = database.connect.prepareStatement("INSERT INTO claim (CLAIM_ID, CUSTOMER_ID, DESCRIPTION, CLAIM_TYPE, CLAIM_PAYMENT) VALUES (?, ?, ?, ?, ?)");
             database.addVehicle = database.connect.prepareStatement("INSERT INTO auto_insurance (POLICY_ID, YEAR, MAKE, MODEL, VIN_NUMBER, MARKET_VALUE, AGE, GENDER, GEOGRAPHIC_LOCATION, CREDIT_HISTORY, DRIVING_RECORD, ANNUAL_MILES) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
@@ -88,8 +90,8 @@ public class Insurance {
         String date_of_birth = "";
         boolean valid_start_date = true;
         while (true) {
-            boolean condition = input.hasNextInt();
-            if (condition) {
+            boolean conditional = input.hasNextInt();
+            if (conditional) {
                 menue_selection = input.nextInt();
                 if (menue_selection == 1) {
                     int customer_id = user_integer("customer_id");
@@ -106,7 +108,7 @@ public class Insurance {
                     String state = user_string("state");
                     String address = user_string("address");
                     long phone_number = user_integer("phone_number");
-                    success = database.insertCustomer(customer_id, name, social_security, email, zip_code, city, state, address, date_of_birth, phone_number);
+                    success = database.insertCustomer(customer_id, name, social_security, email, zip_code, city, state, address, phone_number, date_of_birth);
                     System.out.print("success value is: " + success);
                     break;
                 }
@@ -122,11 +124,38 @@ public class Insurance {
                             System.out.println("[2] Auto Insurance\n");
                             System.out.println("[3] Health Insurance\n");
                             System.out.println("[4] Life Insurance\n");
-                            condition = input.hasNextInt();
-                            if (condition) {
+                            conditional = input.hasNextInt();
+                            if (conditional) {
                                 menue_selection = input.nextInt();
                                 if (menue_selection == 1) {
                                     System.out.print("Policy 1\n");
+                                    System.out.println("customer_id is: " + customer_id);
+                                    int policy_id = user_integer("policy_id");
+                                    String type = user_string("type");
+                                    int cost = user_integer("cost");
+                                    int coverage = user_integer("coverage");
+                                    int deductible = user_integer("deductible");
+                                    int coinsurance = user_integer("coinsurance");
+                                    String effective_date = user_string("effective_date");
+                                    String expire_date = user_string("expire_date");
+                                    String plan = user_string("plan");
+                                    success = database.insertGenericPolicy(customer_id, policy_id, type, cost, coverage, deductible, coinsurance, effective_date, expire_date, plan);
+                                    System.out.println("policy success value is: " + success);
+                                    if (success == 1) {
+                                        String city = user_string("city");
+                                        String state = user_string("state");
+                                        int zip_code = user_integer("zip_code");
+                                        String address = user_string("address");
+                                        int year_built = user_integer("year_built");
+                                        String condition = user_string("condition");
+                                        int square_foot = user_integer("square_foot");
+                                        int lot_size = user_integer("lot_size");
+                                        int credit_score = user_integer("credit_score");
+                                        int mortgage_payment = user_integer("mortgage_payment");
+                                        int market_value = user_integer("market_value");
+                                        success = database.insertHomeInsurance(policy_id, city, state, zip_code, address, year_built, condition, square_foot, lot_size, credit_score, mortgage_payment, market_value);
+                                        System.out.println("home_insurance success value is: " + success);
+                                    }
                                     break;
                                 }
                                 else if (menue_selection == 2) {
@@ -266,7 +295,7 @@ public class Insurance {
     /**
      * Function for inserting new customers into the database
      */
-    public int insertCustomer(int customer_id, String name, int social_security, String email, int zip_code, String city, String state, String address, String date_of_birth, long phone_number) {
+    public int insertCustomer(int customer_id, String name, int social_security, String email, int zip_code, String city, String state, String address, long phone_number, String date_of_birth) {
         int success = 0;
         try {
             createCustomer.setInt(1, customer_id);
@@ -277,32 +306,13 @@ public class Insurance {
             createCustomer.setString(6, city);
             createCustomer.setString(7, state);
             createCustomer.setString(8, address);
-            createCustomer.setDate(9, Date.valueOf(date_of_birth));
-            createCustomer.setLong(10, phone_number);
+            createCustomer.setLong(9, phone_number);
+            createCustomer.setDate(10, Date.valueOf(date_of_birth));
             success = createCustomer.executeUpdate();
         }
         catch (SQLException exception) {
             System.out.println("invalid input!");
             exception.printStackTrace();
-        }
-        return success;
-    }
-
-    /**
-     * Function for inserting new customer policy into the database
-     */
-    public int insertPolicy(String policy_id, String customer_id, String policy_type, String coverage, String policy_cost) {
-        int success = 0;
-        try {
-            addPolicy.setString(1, policy_id);
-            addPolicy.setString(2, customer_id);
-            addPolicy.setString(3, policy_type);
-            addPolicy.setString(4, coverage);
-            addPolicy.setString(5, policy_cost);
-            success = addPolicy.executeUpdate();
-        }
-        catch (SQLException exception) {
-            System.out.println("invalid input!");
         }
         return success;
     }
@@ -461,6 +471,61 @@ public class Insurance {
         }
         return success;
     }
+
+    /**
+     * Insert generic policy under policy table associated with home/auto/health/life insurance in another table
+     * Function for inserting new customer policy into the database
+     */
+    public int insertGenericPolicy(int customer_id, int policy_id, String type, int cost, int coverage, int deductible, int coinsurance, String effective_date, String expire_date, String plan) {
+        int success = 0;
+        try {
+            addPolicy.setInt(1, customer_id);
+            addPolicy.setInt(2, policy_id);
+            addPolicy.setString(3, type);
+            addPolicy.setInt(4, cost);
+            addPolicy.setInt(5, coverage);
+            addPolicy.setInt(6, deductible);
+            addPolicy.setInt(7, coinsurance);
+            addPolicy.setDate(8, Date.valueOf(effective_date));
+            addPolicy.setDate(9, Date.valueOf(expire_date));
+            addPolicy.setString(10, plan);
+            success = addPolicy.executeUpdate();
+        }
+        catch (SQLException exception) {
+            System.out.println("invalid input!");
+            exception.printStackTrace();
+        }
+        return success;
+    }
+    
+    /**
+     * Insert home insurance associated with a policy_id
+     */
+    public int insertHomeInsurance(int policy_id, String city, String state, int zip_code, String address, int year_built, String condition, int square_foot, int lot_size, int credit_score, int mortgage_payment, int market_value) {
+        int success = 0;
+        try {
+            addHomeInsurance.setInt(1, policy_id);
+            addHomeInsurance.setString(2, city);
+            addHomeInsurance.setString(3, state);
+            addHomeInsurance.setInt(4, zip_code);
+            addHomeInsurance.setString(5, address);
+            addHomeInsurance.setInt(6, year_built);
+            addHomeInsurance.setString(7, condition);
+            addHomeInsurance.setInt(8, square_foot);
+            addHomeInsurance.setInt(9, lot_size);
+            addHomeInsurance.setInt(10, credit_score);
+            addHomeInsurance.setInt(11, mortgage_payment);
+            addHomeInsurance.setInt(12, market_value);
+            success = addHomeInsurance.executeUpdate();
+        }
+        catch (SQLException exception) {
+            System.out.println("invalid input!");
+            exception.printStackTrace();
+        }
+        return success;
+    }
+    
+
 }
 
 // customer policy: 
@@ -483,7 +548,8 @@ public class Insurance {
 // insurance can be:  life insurance: term life, whole life and universal life.
 // start readme with assumptions and clarifications made
 // add foreign keys: policy_payment(payment_amount) references cost in policy + claim_payment(payment_amount) references cost in claim
-// add dependants table
+// add / remove dependants (dependants table)
+// add / remove vehicle from policy
 
 // No one can be sure what losses they may suffer – not everyone's risk will be the same. ... Because of this, insurance premiums will vary from person to person because insurers try to make sure that each policyholder pays a premium that reflects their own particular level of risk.
 // print customer_id, policy_id, claim_id!
@@ -496,3 +562,4 @@ public class Insurance {
 
 // Limitations
     // can only add dependants at the beggining in policy creation
+    // for simplification you can only associate one home with a home insruance polciy
