@@ -30,10 +30,10 @@ create table policy(
     customer_id numeric(6,0),
     policy_id numeric(6,0), 
     type varchar(9),
+    plan varchar(6),
     cost numeric(6,2) check (cost > 0),
     coverage numeric(8,2),
     deductible numeric(6,2),
-    copay numeric(6,2),
     coinsurance numeric(2,0),
     effective_date date,
     expire_date date,
@@ -68,7 +68,6 @@ create table auto_insurance(
     total_mileage numeric(6,0),
     annual_miles numeric(6,0),
     market_value numeric(8,2),
-    state varchar(20),
     date_of_birth date,
     gender varchar(2),
     credit_score numeric(3,0),
@@ -82,6 +81,7 @@ create table health_insurance(
     policy_id numeric(6,0),
     plan_category varchar(3),
     out_of_pocket_maximum numeric(8,2),
+    estimated_copay numeric(6,2),
     tobacco_use varchar(3),
     date_of_birth date,
     pre_existing_conditions varchar(3),
@@ -231,5 +231,3 @@ create table quotes(
     primary key (name, item_id),
     foreign key (name) references company(name) on delete set null,
     foreign key (item_id) references item(item_id) on delete set null);
-
-  
