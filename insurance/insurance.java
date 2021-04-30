@@ -7,12 +7,11 @@
  */
 
 import java.util.Scanner;
-import java.util.ArrayList;
-import java.sql.Date;
 import java.sql.Date;
 import java.util.*;
 import java.text.*;
 import java.sql.*;
+import java.util.ArrayList;
 
 /**
  * Insurance database for executing SQL queries using JBDC
@@ -28,7 +27,14 @@ public class Insurance {
             System.out.println("Connection to the oracle database succeeded!\n");
             connection.setAutoCommit(false);
             database.connect = connection;
-            customer_interface(database, connection);        
+
+            /**
+             * Interfaces
+             */
+            customer_interface(database);   
+            // agent_interface(database);        
+            // adjuster_interface(database);        
+            // corperate_interface(database);             
         } catch (SQLException exception) {
             System.out.println("connection to the oracle database failed! Try again!");
             return null;
@@ -55,15 +61,17 @@ public class Insurance {
     private PreparedStatement addDebitCard;
     private PreparedStatement addCreditCard;
     private PreparedStatement getPolicyInformation;
+    private PreparedStatement checkClaimID;
     private PreparedStatement checkClaimStatus;
+    private PreparedStatement checkPolicyID;
     private PreparedStatement addDependant;
-    private PreparedStatement addVehicle;
-    private PreparedStatement dropVehicle;
+    private PreparedStatement addAdditionalVehicle;
+    private PreparedStatement dropAdditionalVehicle;
 
     /**
      * Command-line interface for customers
      */
-    public static void customer_interface(Insurance database, Connection connection) {
+    public static void customer_interface(Insurance database) {
         /**
          * Prepared Statements for customer interface
          */
@@ -82,11 +90,13 @@ public class Insurance {
             database.policyPayment = database.connect.prepareStatement("INSERT INTO policy_payment (PAYMENT_ID, POLICY_ID, RECIPIENT_NAME, RECIPIENT_ADDRESS, BANK, PAYMENT_AMOUNT, PAYMENT_DATE) VALUES (?, ?, ?, ?, ?, ?, ?)");
             database.addDebitCard = database.connect.prepareStatement("INSERT INTO debit (PAYMENT_ID, TYPE, CARD_NUMBER, CVV, POLICY_ID, EXPIARY_DATE) VALUES (?, ?, ?, ?, ?, ?)");
             database.addCreditCard = database.connect.prepareStatement("INSERT INTO credit (PAYMENT_ID, TYPE, CARD_NUMBER, CVV, POLICY_ID, EXPIARY_DATE) VALUES (?, ?, ?, ?, ?, ?)");
-            database.getPolicyInformation = database.connect.prepareStatement("SELECT * FROM WHERE policy_id = ?");
-            database.checkClaimStatus = database.connect.prepareStatement("SELECT decision FROM claim WHERE claim_id = ? or policy_id = ?");
-            database.addDependant = database.connect.prepareStatement("INSERT INTO credit (DEPENDANT_ID, POLICY_ID, NAME, SOCIAL_SECURITY, DATE_OF_BIRTH) VALUES (?, ?, ?, ?, ?)");
-            database.addVehicle = database.connect.prepareStatement("INSERT INTO vehicle (POLICY_ID, VEHICLE_ID, EXTRA_VEHICLE, VEHICLE_TYPE, YEAR, MAKE, MODEL, VIN, LICENSE_PLATE, TOTAL_MILEAGE, ANNUAL_MILES, MARKET_VALUE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            database.dropVehicle = database.connect.prepareStatement("DELETE FROM vehicle WHERE vehicle_id = ?");
+            database.getPolicyInformation = database.connect.prepareStatement("SELECT * FROM policy WHERE policy_id = ?");
+            database.checkClaimID= database.connect.prepareStatement("SELECT claim_id FROM claim WHERE claim_id = ?");
+            database.checkClaimStatus = database.connect.prepareStatement("SELECT decision FROM claim WHERE claim_id = ?");
+            database.checkPolicyID= database.connect.prepareStatement("SELECT policy_id FROM policy WHERE policy_id = ?");
+            database.addDependant = database.connect.prepareStatement("INSERT INTO dependant (DEPENDANT_ID, POLICY_ID, NAME, SOCIAL_SECURITY, DATE_OF_BIRTH) VALUES (?, ?, ?, ?, ?)");
+            database.addAdditionalVehicle = database.connect.prepareStatement("INSERT INTO vehicle (POLICY_ID, VEHICLE_ID, EXTRA_VEHICLE, VEHICLE_TYPE, YEAR, MAKE, MODEL, VIN, LICENSE_PLATE, TOTAL_MILEAGE, ANNUAL_MILES, MARKET_VALUE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            database.dropAdditionalVehicle = database.connect.prepareStatement("DELETE FROM vehicle WHERE vehicle_id = ?");
         }
         catch (SQLException exception) {
             System.out.println("Error with Prepared Statements!");
@@ -312,7 +322,7 @@ public class Insurance {
                     }
                 }
                 else if (menue_selection == 3) {
-                    String policy_id = user_string("policy_id");
+                    int policy_id = user_integer("policy_id");
                     success = database.deletePolicy(policy_id);
                     System.out.print("success value is: " + success);
                     break;
@@ -332,7 +342,7 @@ public class Insurance {
                     break;
                 }
                 else if (menue_selection == 5) {
-                    String claim_id = user_string("claim_id");
+                    int claim_id = user_integer("claim_id");
                     success = database.deleteClaim(claim_id);
                     System.out.print("success value is: " + success);
                     break;
@@ -416,6 +426,61 @@ public class Insurance {
                         // input.next();
                     }
                 }
+                else if (menue_selection == 7) {
+                    System.out.println("Enter existing policy ID: \n");
+                    int policy_id = user_integer("policy_id");
+                    success = database.getPolicyInfo(policy_id);
+                    System.out.print("success value is: " + success);
+                    break;
+                }
+                else if (menue_selection == 8) {
+                    int claim_id = user_integer("claim_id");
+                    success = database.getClaimID(claim_id);
+                    System.out.print("success value is: " + success);
+                    if (claim_id == success) {
+                        database.getClaimStatus(claim_id);
+                    }
+                    break;
+                }
+                else if (menue_selection == 9) {
+                    int policy_id = user_integer("policy_id");
+                    success = database.getPolicyID(policy_id);
+                    System.out.print("success value is: " + success);
+                    if (policy_id == success) {
+                        int dependant_id = user_integer("dependant_id");
+                        String name = user_string("name");
+                        int social_security = user_integer("social_security");
+                        date_of_birth = user_string("date_of_birth");
+                        database.insertDependant(dependant_id, policy_id, name, social_security, date_of_birth);
+                    }
+                    break;
+                }
+                else if (menue_selection == 10) {
+                    System.out.print("[1] Add Additional Vehicle to Auto Insurance Policy");
+                    System.out.print("[2] Delete Vehicle From Policy");
+                    if (menue_selection == 1) {
+                        int policy_id = user_integer("policy_id");
+                        success = database.getPolicyID(policy_id);
+                        System.out.print("success value is: " + success);
+                        if (policy_id == success) {
+                            int vehicle_id = user_integer("vehicle_id");
+                            String name = user_string("name");
+                            int social_security = user_integer("social_security");
+                            date_of_birth = user_string("date_of_birth");
+                            database.insertAdditionalVehicle(vehicle_id, policy_id, name, social_security, date_of_birth);
+                        }
+                        break;
+                    }
+                    if (menue_selection == 2) {
+                        int vehicle_id = user_integer("vehicle_id");
+                        success = database.deleteAdditionalVehicle(vehicle_id);
+                        System.out.print("success value is: " + success);
+                        break;
+                    }
+                    else {
+                        System.out.print("Enter the correct value!");
+                    }
+                }
             }
             else {
                 System.out.println("invalid input! Try again!");
@@ -428,7 +493,7 @@ public class Insurance {
     /**
      * Command-line interface for agents
      */
-    public void agent_interface(Insurance database) {
+    public static void agent_interface(Insurance database) {
         System.out.println("[1] Get all customers associated with a particular agent\n");
         System.out.println("[2] Identify customers with overdue bills\n");
         System.out.println("[3] Customers with pending claims that have not been serviced recently\n");
@@ -456,7 +521,7 @@ public class Insurance {
     /**
      * Command-line interface for adjusters
      */
-    public void adjuster_interface(Insurance database) {
+    public static void adjuster_interface(Insurance database) {
         System.out.println("[1] Identify claims that have not been serviced recently\n");
         System.out.println("[2] Remediation firms or body shops to claims\n");
     }
@@ -464,7 +529,7 @@ public class Insurance {
     /**
      * Command-line interfaces for corperate management
      */
-    public void corperate_interface(Insurance database) {
+    public static void corperate_interface(Insurance database) {
         System.out.println("[1] Generate report on revenue\n");
         System.out.println("[2] Generate report on claims paid\n");
         System.out.println("[3] Generate report on profits based on policy type\n");
@@ -498,10 +563,10 @@ public class Insurance {
     /**
      * Function for deleting existing customer policy into the database
      */
-    public int deletePolicy(String policy_id) {
+    public int deletePolicy(int policy_id) {
         int success = 0;
         try {
-            dropPolicy.setString(1, policy_id);
+            dropPolicy.setInt(1, policy_id);
             success = dropPolicy.executeUpdate();
         }
         catch (SQLException exception) {
@@ -536,10 +601,10 @@ public class Insurance {
     /**
      * Function for deleting existing customer claim from the database
      */
-    public int deleteClaim(String claim_id) {
+    public int deleteClaim(int claim_id) {
         int success = 0;
         try {
-            dropClaim.setString(1, claim_id);
+            dropClaim.setInt(1, claim_id);
             success = dropClaim.executeUpdate();
         }
         catch (SQLException exception) {
@@ -883,12 +948,164 @@ public class Insurance {
         }
         return success;
     }
+
+    /**
+     * getPolicy returns information about a customer's existing policy 
+     */
+    public int getPolicyInfo(int policy_id) {
+        int success = 0;
+        try {
+            getPolicyInformation.setInt(1, policy_id);
+            ResultSet resultset = getPolicyInformation.executeQuery();
+            while (resultset.next()) {
+                int customer_id = resultset.getInt("customer_id");
+                String type = resultset.getString("type");
+                int cost = resultset.getInt("cost");
+                int coverage = resultset.getInt("coverage");
+                int deductible = resultset.getInt("deductible");
+                int coinsurance = resultset.getInt("coinsurance");
+                String effective_date = resultset.getString("effective_date");
+                String expire_date = resultset.getString("expire_date");
+                String plan = resultset.getString("plan");
+                System.out.println("policy customer_id is: " + customer_id);
+                System.out.println("policy policy_id is: " + policy_id);
+                System.out.println("policy type is: " + type);
+                System.out.println("policy cost is: " + cost);
+                System.out.println("policy coverage is: " + coverage);
+                System.out.println("policy deductible is: " + deductible);
+                System.out.println("policy coinsurance is: " + coinsurance);
+                System.out.println("policy effective_date is: " + effective_date);
+                System.out.println("policy expire_date is: " + expire_date);
+                System.out.println("policy plan is: " + plan);
+                success = 1;
+            }
+                resultset.close();
+        }
+        catch (SQLException exception) {
+            System.out.println("policy_id invalid! No policy exists!");
+        }
+        return success;
+    }
+
+    /**
+     * checkClaimID checks if claim id is in the database when user attempts to add a policy
+     */
+    public int getClaimID(int claim_id) {
+        int id = 0;
+        try {
+            checkClaimID.setInt(1, claim_id);
+            ResultSet resultset = checkClaimID.executeQuery();
+            while (resultset.next()) {
+                id = resultset.getInt("claim_id");
+                System.out.println("claim is: " + id);
+            }
+                resultset.close();
+        }
+        catch (SQLException exception) {
+            System.out.println("claim ID invalid! No claim exists!!");
+        }
+        return id;
+    }
+
+    /**
+     * getClaimStatus checks customer's claim status
+     */
+    public String getClaimStatus(int claim_id) {
+        String decision = "";
+        try {
+            checkClaimStatus.setInt(1, claim_id);
+            ResultSet resultset = checkClaimStatus.executeQuery();
+            while (resultset.next()) {
+                decision = resultset.getString("decision");
+                System.out.println("claim decision is: " + decision);
+            }
+                resultset.close();
+        }
+        catch (SQLException exception) {
+            System.out.println("claim invalid! No claim exists!!");
+        }
+        return decision;
+    }
+
+    /**
+     * getPolicyID checks if policy id is in the database when user attempts to add a policy
+     */
+    public int getPolicyID(int policy_id) {
+        int id = 0;
+        try {
+            checkPolicyID.setInt(1, policy_id);
+            ResultSet resultset = checkPolicyID.executeQuery();
+            while (resultset.next()) {
+                id = resultset.getInt("policy_id");
+                System.out.println("policy_id is: " + id);
+            }
+                resultset.close();
+        }
+        catch (SQLException exception) {
+            System.out.println("claim ID invalid! No claim exists!!");
+        }
+        return id;
+    }
+
+    /**
+     * Function for inserting new dependant associated with customer policy
+     */
+    public int insertDependant(int dependant_id, int policy_id, String name, int social_security, String date_of_birth) {
+        int success = 0;
+        try {
+            addDependant.setInt(1, dependant_id);
+            addDependant.setInt(2, policy_id);
+            addDependant.setString(3, name);
+            addDependant.setInt(4, social_security);
+            addDependant.setDate(5, Date.valueOf(date_of_birth));
+            success = addDependant.executeUpdate();
+        }
+        catch (SQLException exception) {
+            System.out.println("invalid input!");
+        }
+        return success;
+    }
+
+    /**
+     * Function for inserting additional vehicle associated with auto insurance policy into the database
+     */
+    public int insertAdditionalVehicle(int vehicle_id, int policy_id, String name, int social_security, String date_of_birth) {
+        int success = 0;
+        try {
+            addAdditionalVehicle.setInt(1, vehicle_id);
+            addAdditionalVehicle.setInt(2, policy_id);
+            addAdditionalVehicle.setString(3, name);
+            addAdditionalVehicle.setInt(4, social_security);
+            addAdditionalVehicle.setDate(5, Date.valueOf(date_of_birth));
+            success = addAdditionalVehicle.executeUpdate();
+        }
+        catch (SQLException exception) {
+            System.out.println("invalid input!");
+        }
+        return success;
+    }
+
+    /**
+     * Function for dropping additional vehicle associated with auto insurance policy from the database
+     */
+    public int deleteAdditionalVehicle(int vehicle_id) {
+        int success = 0;
+        try {
+            dropPolicy.setInt(1, vehicle_id);
+            success = dropAdditionalVehicle.executeUpdate();
+        }
+        catch (SQLException exception) {
+            System.out.println("invalid input!");
+        }
+        return success;
+    }
+
 }
+
 
 // customer policy: 
     // for entering cusomer policy, can have fixed customer policy rates for simplified db
     // IDs generated server side
-
 // better message statements for user input
 // customer can change the payments to anything they want when adding a policy and payment********
 // make enter statements more detailed
@@ -918,6 +1135,11 @@ public class Insurance {
 // customer wants to check the status of a claim -- policy_id or customer_id to check status of all their policies
 // customer wants to add dependants to a policy -- policy_id
 // customer wants to add/drop vehicle to auto_insurance
+// add plan category to insurances
+// Getting policy information, claim informaition using customer_id, policy_id, or claim_id instead of just one?
+// customer_ID does not exist vs a transaction failed!
+// fix try and catch blocks
+// check if customer already exists in database
 
 // No one can be sure what losses they may suffer – not everyone's risk will be the same. ... Because of this, insurance premiums will vary from person to person because insurers try to make sure that each policyholder pays a premium that reflects their own particular level of risk.
 // print customer_id, policy_id, claim_id!
