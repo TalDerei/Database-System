@@ -1,6 +1,6 @@
 create table employee(
     employee_id numeric(6,0),
-    name varchar(30),
+    name varchar(30) not null,
     primary key (employee_id));
 
 create table customer(
@@ -18,11 +18,15 @@ create table customer(
     
 create table agent(
     agent_id numeric(6,0),
+    name varchar(30) not null,
+    salary numeric(6,2),
     primary key (agent_id),
     foreign key (agent_id) references employee(employee_id) on delete set null);
 
 create table adjuster(
     adjuster_id numeric(6,0),
+    name varchar(30) not null,
+    salary numeric(6,2),
     primary key (adjuster_id),
     foreign key (adjuster_id) references employee(employee_id) on delete set null);
 
@@ -37,6 +41,7 @@ create table policy(
     coinsurance numeric(2,0),
     effective_date date,
     expire_date date,
+    policy_status varchar(10), 
     primary key (policy_id),
     foreign key (customer_id) references customer(customer_id) on delete cascade);
 
@@ -113,6 +118,7 @@ create table claim(
     decision varchar(10) default null,
     adjuster_notes varchar(255) default null,
     amount numeric(8,2) default null,
+    claim_status varchar(10), 
     primary key (claim_id),
     foreign key (customer_id) references customer(customer_id) on delete cascade);
 
@@ -141,6 +147,7 @@ create table claim_payment(
     payment_amount numeric(8,2),
     bank varchar(20),
     payment_date date,
+    status varchar(10) default 'pending';
     primary key (payment_id, claim_id),
     foreign key (claim_id) references claim(claim_id) on delete set null);
 
@@ -169,6 +176,8 @@ create table policy_payment(
     recipient_address varchar(50),
     payment_amount numeric(6,2),
     bank varchar(20),
+    payment_date date,
+    status varchar(10) default 'pending';
     primary key (payment_id, policy_id),
     foreign key (policy_id) references policy(policy_id) on delete set null);
 
@@ -262,3 +271,32 @@ create table vehicle(
     market_value numeric(8,2),
     primary key (policy_id, vehicle_id),
     foreign key (policy_id) references policy(policy_id) on delete set null);
+
+create table customer_claim(
+    customer_id numeric(6,0),
+    claim_id numeric(6,0), 
+    primary key (customer_id, claim_id),
+    foreign key (customer_id) references customer(customer_id) on delete set null,
+    foreign key (claim_id) references claim(claim_id) on delete set null);
+
+create table policy_claim(
+    policy_id numeric(6,0),
+    claim_id numeric(6,0), 
+    primary key (policy_id, claim_id),
+    foreign key (policy_id) references policy(policy_id) on delete set null,
+    foreign key (claim_id) references claim(claim_id) on delete set null);
+
+create table policy_includes(
+    policy_id numeric(6,0),
+    item_id numeric(6,0), 
+    primary key (policy_id, item_id),
+    foreign key (policy_id) references policy(policy_id) on delete set null,
+    foreign key (item_id) references item(item_id) on delete set null);
+
+create table claim_includes(
+    claim_id numeric(6,0),
+    item_id numeric(6,0), 
+    primary key (claim_id, item_id),
+    foreign key (claim_id) references claim(claim_id) on delete set null,
+    foreign key (item_id) references item(item_id) on delete set null);
+
