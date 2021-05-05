@@ -1,6 +1,7 @@
 create table employee(
     employee_id numeric(6,0),
     name varchar(30) not null,
+    salary numeric(6,2),
     primary key (employee_id));
 
 create table customer(
@@ -18,15 +19,11 @@ create table customer(
     
 create table agent(
     agent_id numeric(6,0),
-    name varchar(30) not null,
-    salary numeric(6,2),
     primary key (agent_id),
     foreign key (agent_id) references employee(employee_id) on delete set null);
 
 create table adjuster(
     adjuster_id numeric(6,0),
-    name varchar(30) not null,
-    salary numeric(6,2),
     primary key (adjuster_id),
     foreign key (adjuster_id) references employee(employee_id) on delete set null);
 
@@ -260,7 +257,6 @@ create table vehicle(
     policy_id numeric(6,0),
     vehicle_id numeric(6,0),
     extra_vehicle varchar(3),
-    vehicle_type varchar(20),
     year numeric(4,0),
     make varchar(10),
     model varchar(10),
@@ -299,4 +295,3 @@ create table claim_includes(
     primary key (claim_id, item_id),
     foreign key (claim_id) references claim(claim_id) on delete set null,
     foreign key (item_id) references item(item_id) on delete set null);
-
