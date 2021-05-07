@@ -56,6 +56,7 @@ create table home_insurance(
     mortgage_payment numeric (6,2),
     market_value numeric (8,2),
     personal_property_replacement varchar(3),
+    plan_category varchar(20),
     primary key (policy_id),
     foreign key (policy_id) references policy(policy_id) on delete set null);
 
@@ -76,6 +77,7 @@ create table auto_insurance(
     traffic_violations varchar(3),
     number_of_dependants numeric(1,0),
     state varchar(20),
+    plan_category varchar(20),
     primary key (policy_id),
     foreign key (policy_id) references policy(policy_id) on delete set null);
 
@@ -107,7 +109,7 @@ create table life_insurance(
 
 create table claim(
     claim_id numeric(6,0), 
-    customer_id numeric(6,0),
+    policy_id numeric(6,0),
     claim_type varchar(20),
     accident varchar(20),
     items_damaged varchar(3),
@@ -117,7 +119,7 @@ create table claim(
     amount numeric(8,2) default null,
     claim_status varchar(10), 
     primary key (claim_id),
-    foreign key (customer_id) references customer(customer_id) on delete cascade);
+    foreign key (policy_id) references policy(policy_id) on delete cascade);
 
 create table company(
     name varchar(30) not null,
@@ -274,14 +276,7 @@ create table customer_claim(
     primary key (customer_id, claim_id),
     foreign key (customer_id) references customer(customer_id) on delete set null,
     foreign key (claim_id) references claim(claim_id) on delete set null);
-
-create table policy_claim(
-    policy_id numeric(6,0),
-    claim_id numeric(6,0), 
-    primary key (policy_id, claim_id),
-    foreign key (policy_id) references policy(policy_id) on delete set null,
-    foreign key (claim_id) references claim(claim_id) on delete set null);
-
+    
 create table policy_includes(
     policy_id numeric(6,0),
     item_id numeric(6,0), 
