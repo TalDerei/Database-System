@@ -21,13 +21,15 @@ public class Application {
         /**
          * Connect to customer, agent, adjuster, and corperate interfaces
          */
+        System.out.println("**************************************************************");
         System.out.println("[1] Customer Interface\n");
         System.out.println("[2] Agent Interface\n");
         System.out.println("[3] Adjuster Interface\n");
-        System.out.println("[4] Corporate Management Interface\n");
+        System.out.println("[4] Corporate Management Interface");
+        System.out.println("**************************************************************");
         int interfaces;
         while (true) {
-            System.out.print("\nSelect From the List of Interfaces Above: ");
+            System.out.print("\nChoose From the List of Interfaces Above: ");
             Scanner input = new Scanner(System.in);
             boolean condition = input.hasNextInt();
             if (condition) {

@@ -590,4 +590,27 @@ public class IOManager {
         }
         return planCategory;
     }
+
+     /**
+     * Input checking constraints on banks
+     */
+    public static String policyStatus(int max) {
+        String planCategory;
+        Scanner input = new Scanner(System.in);
+        int condition_value = user_integer(max);
+        if (condition_value == 1) {
+            planCategory = "Pending";
+        }
+        else if (condition_value == 2) {
+            planCategory = "Active";
+        }
+        else if (condition_value == 3) {
+            planCategory = "Inactive";
+        }
+        else {
+            System.out.println("Enter [1] Pending, [2] Active, [3] Inactive");
+            return bank(max);
+        }
+        return planCategory;
+    }
 }

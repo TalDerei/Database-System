@@ -126,6 +126,7 @@ import insurance.IOManager;
         String effective_date = "";
         String expire_date = "";
         while (true) {
+            System.out.println("--------------------------------------------------------------");
             System.out.println("[1] Create a New Customer Profile\n");
             System.out.println("[2] Add a Policy\n");
             System.out.println("[3] Drop a Policy\n");
@@ -136,6 +137,7 @@ import insurance.IOManager;
             System.out.println("[8] Add Dependant to Policy\n");
             System.out.println("[9] Add/Drop a Vehicle Associated with a Auto Insurance Policy\n");
             System.out.println("[10] Exit!\n");
+            System.out.println("--------------------------------------------------------------");
 
             System.out.print("\nSelect From the List of Options Above: ");
             boolean conditional = input.hasNextInt();
@@ -191,10 +193,12 @@ import insurance.IOManager;
                     if (customer_id == success_value) {
                         while (true) {
                             System.out.println("Select an Insurance Policy From The List Below: \n");
+                            System.out.println("--------------------------------------------------------------");
                             System.out.println("[1] Home Insurance\n");
                             System.out.println("[2] Auto Insurance\n");
                             System.out.println("[3] Health Insurance\n");
                             System.out.println("[4] Life Insurance\n");
+                            System.out.println("--------------------------------------------------------------");
                             conditional = input.hasNextInt();
                             if (conditional) {
                                 menue_selection = input.nextInt();

@@ -1,2 +1,2 @@
-Main-class: app
+Main-class: Application
 Class-Path: ojdbc8.jar

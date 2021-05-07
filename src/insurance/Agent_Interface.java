@@ -11,7 +11,6 @@ package insurance;
 import java.util.Scanner;
 import java.sql.Date;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.sql.*;
 import java.util.*;
@@ -49,26 +48,26 @@ import java.text.*;
      * Establish a connection to the Oracle database
      */
     public static Agent_Interface connect_database() {
-        String username = "";
-        String password = "";
-        try {
-            Scanner input = new Scanner(System.in);
-            System.out.print("enter Oracle user id: ");   
-            username = input.nextLine();
-            System.out.print("enter Oracle password for " + username + ": ");
-            password = input.nextLine();    
-        }
-        catch (InputMismatchException inputMismatchException) {
-            System.out.println("Wrong credentials! Try Again!");
-            return null;
-        }
+        String username = "tad222";
+        String password = "sailcreator1";
+        // try {
+        //     Scanner input = new Scanner(System.in);
+        //     System.out.print("enter Oracle user id: ");   
+        //     username = input.nextLine();
+        //     System.out.print("enter Oracle password for " + username + ": ");
+        //     password = input.nextLine();    
+        // }
+        // catch (InputMismatchException inputMismatchException) {
+        //     System.out.println("Wrong credentials! Try Again!");
+        //     return null;
+        // }
         
         Agent_Interface database = new Agent_Interface();
         try (Connection connection = DriverManager.getConnection("jdbc:oracle:thin:@edgar1.cse.lehigh.edu:1521:cse241",username,password);
         ) {
             System.out.println("Connection to the oracle database succeeded!\n");
-            connection.setAutoCommit(false);
-            database.connect = connection;          
+            database.connect = connection;
+            Agent(database);                   
         } catch (SQLException exception) {
             System.out.println("connection to the oracle database failed! Try again!");
             return connect_database();
@@ -86,8 +85,8 @@ import java.text.*;
         try {
             database.checkAgentID = database.connect.prepareStatement("SELECT agent_id FROM agent WHERE agent_id = ?");
             database.checkAgentCustomers = database.connect.prepareStatement("SELECT customer_id FROM customer_agent WHERE agent_id = ?");
-            database.overdueBills = database.connect.prepareStatement("SELECT customer_id FROM customer NATURAL JOIN policy NATURAL JOIN policy_payment WHERE status = 'late'");
-            database.pendingClaims = database.connect.prepareStatement("SELECT customer_id FROM customer NATURAL JOIN claim NATURAL JOIN claim_payment WHERE status = 'pending'");
+            database.overdueBills = database.connect.prepareStatement("SELECT customer_id FROM customer NATURAL JOIN policy NATURAL JOIN policy_payment WHERE status = 'LATE'");
+            database.pendingClaims = database.connect.prepareStatement("SELECT customer_id FROM customer NATURAL JOIN claim NATURAL JOIN claim_payment NATURAL JOIN policy WHERE claim_status = 'Pending'");
             database.estimatedRevenue = database.connect.prepareStatement("SELECT cost FROM customer_agent NATURAL JOIN policy WHERE agent_id = ?");
             database.checkPolicyID = database.connect.prepareStatement("SELECT policy_id FROM policy WHERE policy_id = ?");
             database.changePolicyType = database.connect.prepareStatement("UPDATE policy SET type = ? WHERE policy_id = ?");
@@ -100,7 +99,7 @@ import java.text.*;
             database.changePolicyPlan = database.connect.prepareStatement("UPDATE policy SET plan = ? WHERE policy_id = ?");
             database.changePolicyStatus = database.connect.prepareStatement("UPDATE policy SET policy_status = ? WHERE policy_id = ?");
             database.checkCustomerID = database.connect.prepareStatement("SELECT customer_id FROM customer WHERE customer_id = ?");
-            database.getAllCustomerPolicy = database.connect.prepareStatement("SELECT policy_id FROM customer_policy WHERE customer_id = ?");
+            database.getAllCustomerPolicy = database.connect.prepareStatement("SELECT policy_id FROM policy WHERE customer_id = ?");
             database.getPolicyInformation = database.connect.prepareStatement("SELECT * FROM policy WHERE policy_id = ?");
             database.getAllCustomers = database.connect.prepareStatement("SELECT customer_id FROM policy WHERE policy_id = ?");
             database.agentAdjuster = database.connect.prepareStatement("SELECT adjuster_id FROM communicates WHERE agent_id = ?");
@@ -112,192 +111,198 @@ import java.text.*;
         /**
          * Command-line interface for agent interface
          */
-        System.out.println("[1] Get all customers associated with a particular agent\n");
-        System.out.println("[2] Identify customers with overdue bills\n");
-        System.out.println("[3] Customers with pending claims that have not been serviced recently\n");
-        System.out.println("[4] Compute estimated revenue generated by an agent\n");
-        System.out.println("[5] Update a customer's policy\n");
-        System.out.println("[6] Get all polcies associated with a particular customer\n"); 
-        System.out.println("[7] Get policy information associated with a customer's policy\n"); 
-        System.out.println("[8] Get all customers (and dependants) associated with a particular policy\n"); 
-        System.out.println("[9] Get all adjusters an agent communicates with\n");
-
-        // get all customer policy info
-
-        // get all policies that an agent manages
-
         Scanner input = new Scanner(System.in);
         int menue_selection;
         int success; 
+        boolean valid_start_date = true;
+        boolean valid_end_date = true;
         while (true) {
+            System.out.println("--------------------------------------------------------------");
+            System.out.println("[1] Get All Customers Associated With a Particular Agent\n");
+            System.out.println("[2] Identify Customers With Overdue Bills\n");
+            System.out.println("[3] Customers With Pending Claims That Have Not Been Serviced Recently\n");
+            System.out.println("[4] Compute the Estimated Revenue Generated by an Agent\n");
+            System.out.println("[5] Update a Customer's Policy\n");
+            System.out.println("[6] Get All Polcies Associated With a Particular Customer\n"); 
+            System.out.println("[7] Get Policy Information Associated With a Customer's Policy\n"); 
+            System.out.println("[8] Get All Customers (and Dependants) Associated With a Particular Policy\n"); 
+            System.out.println("[9] Get All Adjusters an Agent Communicates With\n");
+            System.out.println("[10] Exit!");
+            System.out.println("--------------------------------------------------------------");
+            System.out.print("\nSelect From the List of Options Above: ");
             boolean conditional = input.hasNextInt();
             if (conditional) {
                 menue_selection = input.nextInt();
                 if (menue_selection == 1) {
-                    int agent_id = user_integer("agent_id");
+                    System.out.print("\nEnter 6-Digit Agent ID to Retrieve All Customers Managed By That Agent: ");
+                    int agent_id = user_integer();
                     success = database.getAgentID(agent_id);
-                    System.out.println("success value is: " + success);
                     if (agent_id == success) {
                         database.getAgentCustomers(agent_id);
-                        System.out.print("success value is: " + success);
                     }
-                    break;
+                    else {
+                        System.out.println("Agent With ID " + agent_id + " Does NOT Exist!\n");
+                    }
                 }
                 else if (menue_selection == 2) {
+                    System.out.println("Customers with Overdue Bills: ");
                     database.getOverdueBill();
                 }
                 else if (menue_selection == 3) {
+                    System.out.println("Customers with Pending Claims: ");
                     database.getPendingClaim();
-                    break;
                 }
                 else if (menue_selection == 4) {
-                    int agent_id = user_integer("agent_id");
+                    System.out.print("Revenue by the Agent: ");
+                    int agent_id = user_integer();
                     success = database.getAgentID(agent_id);
-                    System.out.println("success value is: " + success);
                     if (agent_id == success) {
                         int estimated_revenue = database.getEstimatedRevenue(agent_id);
-                        System.out.println("Estimated revenue for agent " + agent_id + " is " + estimated_revenue);
-                        break;
+                        System.out.println("Estimated revenue for agent " + agent_id + " is " + estimated_revenue + "\n");
+                    }
+                    else {
+                        System.out.println("Agent With ID " + agent_id + " Does NOT Exist!");
                     }
                 }
                 else if (menue_selection == 5) {
                     int index;
                     int intPlaceHolder = 0;
                     String stringPlaceHolder = "";
-                    int policy_id = user_integer("policy_id");
+                    System.out.print("Please Enter an Existing 6-digit Policy ID To Update the Policy: ");
+                    int policy_id = user_integer();
                     success = database.getPolicyID(policy_id);
-                    System.out.print("success value is: " + success);
                     if (policy_id == success) {
-                        System.out.println("");
-                        System.out.println("[1] Change type associated with customer policy");
-                        System.out.println("[2] Change cost associated with customer policy");
-                        System.out.println("[3] Change coverage associated with customer policy");
-                        System.out.println("[4] Change deductible associated with customer policy");
-                        System.out.println("[5] Change coinsurance associated with customer policy");
-                        System.out.println("[6] Change effective_date associated with customer policy");
-                        System.out.println("[7] Change expire_date associated with customer policy");
-                        System.out.println("[8] Change plan associated with customer policy");
-                        System.out.println("[9] Change policy_status associated with customer policy");
+                        System.out.println("\n--------------------------------------------------------------");
+                        System.out.println("[1] Change Type Associated With Customer Policy");
+                        System.out.println("[2] Change Cost Associated With Customer Policy");
+                        System.out.println("[3] Change Coverage Associated With Customer Policy");
+                        System.out.println("[4] Change Deductible Associated With Customer Policy");
+                        System.out.println("[5] Change Coinsurance Associated With Customer Policy");
+                        System.out.println("[6] Change Effective Date Associated With Customer Policy");
+                        System.out.println("[7] Change Expiration Date Associated With Customer Policy");
+                        System.out.println("[8] Change Policy Status Associated With Customer Policy");
+                        System.out.println("--------------------------------------------------------------\n");
+                        System.out.print("Please Choose What Part of the Policy You Would Like to Update: ");
                         menue_selection = input.nextInt();
                         if (menue_selection == 1) {
                             index = 1;
-                            String type = user_string("type");
-                            System.out.println("success value is: " + type);
-                            int success1 = database.updateCustomerPolicy(policy_id, intPlaceHolder, type, index);
-                            System.out.println("success value is: " + success1);
-                            break;
+                            System.out.print("Update Type: [1] Single, [2] Family ");
+                            String type = IOManager.policyType(1);
+                            database.updateCustomerPolicy(policy_id, intPlaceHolder, type, index);                            
                         }
                         else if (menue_selection == 2) {
                             index = 2;
-                            int cost = user_integer("cost");
-                            System.out.println("success value is: " + cost);
-                            int success1 = database.updateCustomerPolicy(policy_id, cost, stringPlaceHolder, index);
-                            System.out.println("success value is: " + success1);
-                            break;
+                            System.out.print("Update Cost: ");
+                            double cost = IOManager.intInputDouble(0.00, 999999.99);
+                            database.updateCustomerPolicy(policy_id, cost, stringPlaceHolder, index);
                         }
                         else if (menue_selection == 3) {
                             index = 3;
-                            int coverage = user_integer("coverage");
-                            System.out.println("success value is: " + coverage);
-                            int success1 = database.updateCustomerPolicy(policy_id, coverage, stringPlaceHolder, index);
-                            System.out.println("success value is: " + success1);
-                            break;
+                            System.out.print("Update Coverage: ");
+                            double coverage = IOManager.intInputDouble(0, 999999.99);
+                            database.updateCustomerPolicy(policy_id, coverage, stringPlaceHolder, index);
                         }
                         else if (menue_selection == 4) {
                             index = 4;
-                            int deductible = user_integer("deductible");
-                            System.out.println("success value is: " + deductible);
-                            int success1 = database.updateCustomerPolicy(policy_id, deductible, stringPlaceHolder, index);
-                            System.out.println("success value is: " + success1);
-                            break;
+                            System.out.print("Update Deductible: ");
+                            double deductible = IOManager.intInputDouble(0, 9999.99);
+                            database.updateCustomerPolicy(policy_id, deductible, stringPlaceHolder, index);
                         }
                         else if (menue_selection == 5) {
                             index = 5;
-                            int coinsurance = user_integer("coinsurance");
-                            System.out.println("success value is: " + coinsurance);
-                            int success1 = database.updateCustomerPolicy(policy_id, coinsurance, stringPlaceHolder, index);
-                            System.out.println("success value is: " + success1);
-                            break;
+                            System.out.print("Update Coinsurance: ");
+                            double coinsurance = IOManager.intInputDouble(0, 99);
+                            database.updateCustomerPolicy(policy_id, coinsurance, stringPlaceHolder, index);
                         }
                         else if (menue_selection == 6) {
                             index = 6;
-                            String effective_date = user_string("effective_date");
-                            System.out.println("success value is: " + effective_date);
-                            int success1 = database.updateCustomerPolicy(policy_id, intPlaceHolder, effective_date, index);
-                            System.out.println("success value is: " + success1);
-                            break;
+                            System.out.print("Update Effective Date: ");
+                            String effective_date = "";
+                            while (valid_start_date) {
+                                effective_date = input.next();
+                                valid_start_date = validateDate(effective_date);
+                            } 
+                            database.updateCustomerPolicy(policy_id, intPlaceHolder, effective_date, index);
                         }
                         else if (menue_selection == 7) {
                             index = 7;
-                            String expire_date = user_string("expire_date");
-                            System.out.println("success value is: " + expire_date);
-                            int success1 = database.updateCustomerPolicy(policy_id, intPlaceHolder, expire_date, index);
-                            System.out.println("success value is: " + success1);
-                            break;
+                            System.out.print("Update Expiration Date: ");
+                            String expire_date = "";
+                            while (valid_end_date) {
+                                expire_date = input.next();
+                                valid_end_date = validateDate(expire_date);
+                            } 
+                            database.updateCustomerPolicy(policy_id, intPlaceHolder, expire_date, index);
                         }
                         else if (menue_selection == 8) {
                             index = 8;
-                            String plan = user_string("plan");
-                            System.out.println("success value is: " + plan);
-                            int success1 = database.updateCustomerPolicy(policy_id, intPlaceHolder, plan, index);
-                            System.out.println("success value is: " + success1);
-                            break;
-                        }
-                        else if (menue_selection == 9) {
-                            index = 9;
-                            String policy_status = user_string("policy_status");
-                            System.out.println("success value is: " + policy_status);
-                            int success1 = database.updateCustomerPolicy(policy_id, intPlaceHolder, policy_status, index);
-                            System.out.println("success value is: " + success1);
-                            break;
+                            System.out.println("Update Policy Status: [1] Pending, [2] Active, [3] Inactive");
+                            String policy_status = IOManager.policyStatus(1);
+                            database.updateCustomerPolicy(policy_id, intPlaceHolder, policy_status, index);
                         }
                     }
-                    break;
+                    
                 }
                 else if (menue_selection == 6) {
-                    int customer_id = user_integer("customer_id");
+                    System.out.print("Please Enter an Existing 6-digit Customer ID to Get All Policies Associated With the Customer: ");
+                    int customer_id = user_integer();
                     success = database.getCustomerID(customer_id);
-                    System.out.print("success value is: " + success);
                     if (customer_id == success) {
                         database.getAllCustomerPolicyList(customer_id);
                     }
-                    break;
+                    else {
+                        System.out.println("Customer With ID " + customer_id + " Does NOT Exist! Try Again!");
+                    }                    
                 }
                 else if (menue_selection == 7) {
-                    System.out.println("Enter existing policy ID: \n");
-                    int policy_id = user_integer("policy_id");
-                    success = database.getPolicyInfo(policy_id);
-                    System.out.print("success value is: " + success);
-                    break;
+                    System.out.print("Please Enter an Existing 6-digit Policy ID to Get Policy Information Associated With That Specific Policy: ");
+                    int policy_id = user_integer();
+                    success = database.getPolicyID(policy_id);
+                    if (policy_id == success) {
+                        int success1 = database.getPolicyInfo(policy_id);
+                    }
+                    else {
+                        System.out.println("Policy With ID " + policy_id + " Does NOT Exist!");
+                    }                
                 }
                 else if (menue_selection == 8) {
-                    System.out.println("Enter existing policy ID: \n");
-                    int policy_id = user_integer("policy_id");
-                    success = database.getAllCustomersList(policy_id);
-                    System.out.print("success value is: " + success);
-                    break;
+                    System.out.print("Enter Existing Policy ID To Retrieve Customers: ");
+                    int policy_id = user_integer();
+                    success = database.getPolicyID(policy_id);
+                    if (policy_id == success) {
+                        database.getAllCustomersList(policy_id);
+                    }
+                    else {
+                        System.out.println("Policy With ID " + policy_id + " Does NOT Exist!");
+                    } 
                 }
                 else if (menue_selection == 9) {
-                    System.out.println("Enter existing agent ID: \n");
-                    int agent_id = user_integer("agent_id");
-                    success = database.getAdjusterAgent(agent_id);
-                    System.out.print("success value is: " + success);
-                    break;
+                    System.out.print("Enter Existing Agent ID to Retrieve Adjusters They Communicate With: ");
+                    int agent_id = user_integer();
+                    success = database.getAgentID(agent_id);
+                    if (agent_id == success) {
+                        success = database.getAdjusterAgent(agent_id);
+                    }
+                    else {
+                        System.out.println("Agent With ID " + agent_id + " Does NOT Exist!");
+                    } 
                 }
-                else {
-                    System.out.println("invalid input!");
-                    input.next();
+                else if (menue_selection == 10) {
+                    System.exit(0);
                 }
             }
+            else {
+                System.out.println("Invalid Input! Try again!\n");
+                input.nextLine();
+            } 
         }
     }
     
-    /**
+/**
  * FUNCTIONS ASSOCIATED WITH AGENT_INTERFACE
  */
-
     /** 
-     * getAgentID checks if agent id is in the database 
+     * getAgentID checks if agent ID is in the database 
      */
     public int getAgentID(int agent_id) {
         int id = 0;
@@ -306,18 +311,18 @@ import java.text.*;
             ResultSet resultset = checkAgentID.executeQuery();
             while (resultset.next()) {
                 id = resultset.getInt("agent_id");
-                System.out.println("agent ID is: " + id);
+                System.out.println("Agent ID: " + id);
             }
                 resultset.close();
         }
         catch (SQLException exception) {
-            System.out.println("agent ID invalid! No agent exists!");
+            System.out.println("agent ID Invalid! No Agent Exists With That ID.");            
         }
         return id;
     }
 
     /**
-     * Function for getting customers associated with a specific agent
+     * getAgentCustomers retrieves customers associated with a specific agent
      */
     public int getAgentCustomers(int agent_id) {
         int id = 0;
@@ -326,17 +331,19 @@ import java.text.*;
             ResultSet resultset = checkAgentCustomers.executeQuery();
             while (resultset.next()) {
                 id = resultset.getInt("customer_id");
-                System.out.println("customer_id is: " + id);
+                System.out.println("Customer ID is: " + id + "\n");
             }
-            id = resultset.getInt("customer_id");
                 resultset.close();
         }
         catch (SQLException exception) {
-            System.out.println("Customer_id invalid! No customer exists!!");
+            System.out.println("Agent Doesn't Manage Any Customers Yet!");
         }
         return id;
     }
 
+    /**
+     * checkPaymentStatus checks the status of a payment
+     */
     public static String checkPaymentStatus(Calendar calendar, LocalDate localdate) {
         String status = "";
         System.out.println("policy day is: " + calendar.get(Calendar.DAY_OF_MONTH));
@@ -360,12 +367,12 @@ import java.text.*;
             ResultSet resultset = overdueBills.executeQuery();
             while (resultset.next()) {
                 customer_id = resultset.getInt("customer_id");
-                System.out.println("customer with overdue bill: " + customer_id);
+                System.out.println("Customer ID: " + customer_id);
             }
                 resultset.close();
         }
         catch (SQLException exception) {
-            System.out.println("Customer_id invalid! No customer exists!!");
+            System.out.println("Try Again!");
         }
         return customer_id;
     }
@@ -379,12 +386,12 @@ import java.text.*;
             ResultSet resultset = pendingClaims.executeQuery();
             while (resultset.next()) {
                 customer_id = resultset.getInt("customer_id");
-                System.out.println("customer with pending claim: " + customer_id);
+                System.out.println("Customer ID: " + customer_id + "\n");
             }
                 resultset.close();
         }
         catch (SQLException exception) {
-            System.out.println("Customer_id invalid! No customer exists!!");
+            System.out.println("Try Again!");
         }
         return customer_id;
     }
@@ -409,105 +416,103 @@ import java.text.*;
     }
 
     /**
-     * Function for updating customer policy 
+     * updateCustomerPolicy updates a customers policy 
      */
-    public int updateCustomerPolicy(int policy_id, int typeInt, String typeString, int index) {
+    public int updateCustomerPolicy(int policy_id, double typeInt, String typeString, int index) {
         int success = 0;
         if (index == 1) {
             try {
                 changePolicyType.setString(1, typeString);
                 changePolicyType.setInt(2, policy_id);
                 success = changePolicyType.executeUpdate();
+                System.out.println("POLICY UPDATED!");
             }
             catch (SQLException exception) {
-                System.out.println("invalid input!");
+                System.out.println("Invalid Input! Try Again!");
             }
         }
         else if (index == 2) {
             try {
-                changePolicyCost.setInt(1, typeInt);
+                changePolicyCost.setDouble(1, typeInt);
                 changePolicyCost.setInt(2, policy_id);
                 success = changePolicyCost.executeUpdate();
+                System.out.println("POLICY UPDATED!");
             }
             catch (SQLException exception) {
-                System.out.println("invalid input!");
+                System.out.println("Invalid Input! Try Again!");
             }
         }
         else if (index == 3) {
             try {
-                changePolicyCoverage.setInt(1, typeInt);
+                changePolicyCoverage.setDouble(1, typeInt);
                 changePolicyCoverage.setInt(2, policy_id);
                 success = changePolicyCoverage.executeUpdate();
+                System.out.println("POLICY UPDATED!");
             }
             catch (SQLException exception) {
-                System.out.println("invalid input!");
+                System.out.println("Invalid Input! Try Again!");
             }
         }
         else if (index == 4) {
             try {
-                changePolicyDeductible.setInt(1, typeInt);
+                changePolicyDeductible.setDouble(1, typeInt);
                 changePolicyDeductible.setInt(2, policy_id);
                 success = changePolicyDeductible.executeUpdate();
+                System.out.println("POLICY UPDATED!");
             }
             catch (SQLException exception) {
-                System.out.println("invalid input!");
+                System.out.println("Invalid Input! Try Again!");
             }
         }
         else if (index == 5) {
             try {
-                changePolicyCoinsurance.setInt(1, typeInt);
+                changePolicyCoinsurance.setDouble(1, typeInt);
                 changePolicyCoinsurance.setInt(2, policy_id);
                 success = changePolicyCoinsurance.executeUpdate();
+                System.out.println("POLICY UPDATED!");
             }
             catch (SQLException exception) {
-                System.out.println("invalid input!");
+                System.out.println("Invalid Input! Try Again!");
             }
         }
         else if (index == 6) {
             try {
-                changePolicyEffectiveDate.setString(1, typeString);
+                changePolicyEffectiveDate.setDate(1, Date.valueOf(typeString));
                 changePolicyEffectiveDate.setInt(2, policy_id);
                 success = changePolicyEffectiveDate.executeUpdate();
+                System.out.println("POLICY UPDATED!");
             }
             catch (SQLException exception) {
-                System.out.println("invalid input!");
+                System.out.println("Invalid Input! Try Again!");
             }
         }
         else if (index == 7) {
             try {
-                changePolicyExpireDate.setString(1, typeString);
+                changePolicyExpireDate.setDate(1, Date.valueOf(typeString));
                 changePolicyExpireDate.setInt(2, policy_id);
                 success = changePolicyExpireDate.executeUpdate();
+                System.out.println("POLICY UPDATED!");
             }
             catch (SQLException exception) {
-                System.out.println("invalid input!");
+                System.out.println("Invalid Input! Try Again!");
             }
         }
         else if (index == 8) {
             try {
-                changePolicyPlan.setString(1, typeString);
-                changePolicyPlan.setInt(2, policy_id);
-                success = changePolicyPlan.executeUpdate();
-            }
-            catch (SQLException exception) {
-                System.out.println("invalid input!");
-            }
-        }
-        else if (index == 9) {
-            try {
                 changePolicyStatus.setString(1, typeString);
                 changePolicyStatus.setInt(2, policy_id);
                 success = changePolicyStatus.executeUpdate();
+                System.out.println("POLICY UPDATED!");
             }
             catch (SQLException exception) {
-                System.out.println("invalid input!");
+                System.out.println("Invalid Input! Try Again!");
             }
         }
         return success;
     }
 
     /**
-     * Function for getting all polcies associated with a specific customer
+     * getAllCustomerPolicyList gets all polcies associated with a specific customer
      */
     public int getAllCustomerPolicyList(int customer_id) {
         int id = 0;
@@ -516,18 +521,18 @@ import java.text.*;
             ResultSet resultset = getAllCustomerPolicy.executeQuery();
             while (resultset.next()) {
                 id = resultset.getInt("policy_id");
-                System.out.println("policy_id is: " + id);
+                System.out.println("Policy ID: " + id);
             }
                 resultset.close();
         }
         catch (SQLException exception) {
-            System.out.println("Customer_id invalid! No customer exists!!");
+            System.out.println("Invalid Input!");
         }
         return id;
     }
 
     /**
-     * Function for getting all customers associated with a specific policy
+     * getAllCustomersList gets all customers associated with a specific policy
      */
     public int getAllCustomersList(int policy_id) {
         int id = 0;
@@ -536,18 +541,18 @@ import java.text.*;
             ResultSet resultset = getAllCustomers.executeQuery();
             while (resultset.next()) {
                 id = resultset.getInt("customer_id");
-                System.out.println("customer_id is: " + id);
+                System.out.println("Customer ID: " + id);
             }
                 resultset.close();
         }
         catch (SQLException exception) {
-            System.out.println("Customer_id invalid! No customer exists!!");
+            System.out.println("Invalid Input!");
         }
         return id;
     }
 
     /**
-     * Function for getting all adjusters associated with a specific agent
+     * getAdjusterAgent gets all adjusters associated with a specific agent
      */
     public int getAdjusterAgent(int agent_id) {
         int id = 0;
@@ -556,34 +561,31 @@ import java.text.*;
             ResultSet resultset = agentAdjuster.executeQuery();
             while (resultset.next()) {
                 id = resultset.getInt("adjuster_id");
-                System.out.println("adjuster_id is: " + id);
+                System.out.println("Adjuster ID: " + id);
             }
                 resultset.close();
         }
         catch (SQLException exception) {
-            System.out.println("Customer_id invalid! No customer exists!!");
+            System.out.println("Invalid Input!");
         }
         return id;
     }
 
     /**
-     * Input checking constraints on user integer
+     * Input checking constraints on integer input
      */
-    public static int user_integer(String message) {
-        System.out.println("enter: " + message);
+    public static int user_integer() {
         Scanner input = new Scanner(System.in);
             boolean conditional = true;
             while (conditional) {
                 boolean condition = input.hasNextInt();
-                System.out.println("condition is: " + condition);
                 if (condition) {
                     int user_input = input.nextInt();
-                    System.out.println("entered int!");
                     conditional = false; 
                     return user_input; 
                 }
                 else {
-                    System.out.println("entered string!");
+                    System.out.println("Invalid Input!");
                     conditional = true;
                     input.next();
                 }
@@ -592,23 +594,20 @@ import java.text.*;
     }
     
      /**
-     * Input checking constraints on user string 
+     * Input checking constraints on string input
      */
-    public static String user_string(String message) {
-        System.out.println("enter: " + message);
+    public static String user_string() {
         Scanner input = new Scanner(System.in);
             boolean conditional = true;
             while (conditional) {
                 boolean condition = input.hasNextInt();
-                System.out.println("condition is: " + conditional);
                 if (!condition) {
                     String user_input = input.nextLine();
-                    System.out.println("entered string!");
                     conditional = false; 
                     return user_input; 
                 }
                 else {
-                    System.out.println("entered integer!");
+                    System.out.println("Invalid Input!");
                     conditional = true;
                     input.next();
                 }
@@ -626,12 +625,12 @@ import java.text.*;
             ResultSet resultset = checkPolicyID.executeQuery();
             while (resultset.next()) {
                 id = resultset.getInt("policy_id");
-                System.out.println("policy_id is: " + id);
+                System.out.println("Policy ID: " + id);
             }
                 resultset.close();
         }
         catch (SQLException exception) {
-            System.out.println("claim ID invalid! No claim exists!!");
+            System.out.println("Invalid Input!");
         }
         return id;
     }
@@ -646,7 +645,7 @@ import java.text.*;
             ResultSet resultset = checkCustomerID.executeQuery();
             while (resultset.next()) {
                 id = resultset.getInt("customer_id");
-                System.out.println("customer_id is: " + id);
+                System.out.println("Customer ID: " + id);
             }
             try {
                 resultset.close();
@@ -656,7 +655,7 @@ import java.text.*;
             }
         }
         catch (SQLException exception) {
-            System.out.println("Customer_id invalid! No customer exists!!");
+            System.out.println("Invalid Input!");
         }
         return id;
     }
@@ -679,23 +678,37 @@ import java.text.*;
                 String effective_date = resultset.getString("effective_date");
                 String expire_date = resultset.getString("expire_date");
                 String plan = resultset.getString("plan");
-                System.out.println("policy customer_id is: " + customer_id);
-                System.out.println("policy policy_id is: " + policy_id);
-                System.out.println("policy type is: " + type);
-                System.out.println("policy cost is: " + cost);
-                System.out.println("policy coverage is: " + coverage);
-                System.out.println("policy deductible is: " + deductible);
-                System.out.println("policy coinsurance is: " + coinsurance);
-                System.out.println("policy effective_date is: " + effective_date);
-                System.out.println("policy expire_date is: " + expire_date);
-                System.out.println("policy plan is: " + plan);
+                System.out.println("Customer ID is: " + customer_id);
+                System.out.println("Policy ID is: " + policy_id);
+                System.out.println("Type is: " + type);
+                System.out.println("Cost is: " + cost);
+                System.out.println("Coverage is: " + coverage);
+                System.out.println("Deductible is: " + deductible);
+                System.out.println("Coinsurance is: " + coinsurance);
+                System.out.println("Effective Date is: " + effective_date);
+                System.out.println("Expire Date is: " + expire_date);
+                System.out.println("Plan is: " + plan);
                 success = 1;
             }
                 resultset.close();
         }
         catch (SQLException exception) {
-            System.out.println("policy_id invalid! No policy exists!");
+            System.out.println("Invalid Input!");
         }
         return success;
+    }
+
+     /**
+     * validateDate check's the format of date types
+     */
+    public static Boolean validateDate(String date_of_birth) {
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            format.parse(date_of_birth);
+        } catch (ParseException exception) {
+            System.out.println("Invalid Input!");
+            return true;
+        }
+        return false;
     }
 }
