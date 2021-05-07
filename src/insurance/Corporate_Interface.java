@@ -8,22 +8,49 @@
 
 package insurance;
 
-import java.util.Scanner;
-import java.sql.Date;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.sql.*;
 import java.util.*;
 import java.text.*;
 
 public class Corporate_Interface {
-    // public Connection connect;
+    public Connection connect;
+     /**
+     * Establish a connection to the Oracle database
+     */
+    public static Corporate_Interface connect_database() {
+        String username = "tad222";
+        String password = "sailcreator1";
+        // try {
+        //     Scanner input = new Scanner(System.in);
+        //     System.out.print("enter Oracle user id: ");   
+        //     username = input.nextLine();
+        //     System.out.print("enter Oracle password for " + username + ": ");
+        //     password = input.nextLine();    
+        // }
+        // catch (InputMismatchException inputMismatchException) {
+        //     System.out.println("Wrong credentials! Try Again!");
+        //     return null;
+        // }
+        
+        Corporate_Interface database = new Corporate_Interface();
+        try (Connection connection = DriverManager.getConnection("jdbc:oracle:thin:@edgar1.cse.lehigh.edu:1521:cse241",username,password);
+        ) {
+            System.out.println("\nConnection to the oracle database succeeded!\n");
+            connection.setAutoCommit(false);
+            database.connect = connection;   
+            Corperate(database);         
+        } catch (SQLException exception) {
+            System.out.println("\nConnection to the oracle database failed! Try again!\n");
+            return connect_database();
+        }
+        return database;
+    }
 
      /**
      * Command-line interfaces for corperate management
      */
-    public static void Corperate_Interface(Corporate_Interface database) {
+    public static void Corperate(Corporate_Interface database) {
+        System.out.println("--------------------------------------------------------------");
         System.out.println("[1] Generate report on revenue\n");
         System.out.println("[2] Generate report on claims paid\n");
         System.out.println("[3] Generate report on profits based on policy type\n");
@@ -32,8 +59,11 @@ public class Corporate_Interface {
         System.out.println("[6] Terminate an employee (agent or adjuster) from the company\n");
         System.out.println("[7] Add an agent to the company\n");
         System.out.println("[8] Add an adjuster to the company\n");
+        System.out.println("--------------------------------------------------------------");
+        System.out.println("\n");
+        System.out.println("\n");
+        System.out.println("THE CORPERATE INTERFACE IS DOWN FOR MAINTENENCE AS THE DEPARTMENT IS UNDERGOING A RESTRUCTUERING!");
     }
-
 }
 
  

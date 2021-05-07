@@ -11,7 +11,7 @@ import java.util.Scanner;
 import insurance.Customer_Interface;
 import insurance.Adjuster_Interface;
 import insurance.Agent_Interface;
-// import insurance.Corperate_Interface;
+import insurance.Corporate_Interface;
 
 /**
  * User-interface for insurance database
@@ -46,9 +46,10 @@ public class Application {
                     Adjuster_Interface adjuster_connection = Adjuster_Interface.connect_database();
                     break;
                 }
-                // else if (interfaces == 4) {
-                //    Corperate_Interface corporate_connection = Corperate_Interface.connect_database();
-                // }
+                else if (interfaces == 4) {
+                    Corporate_Interface corporate_interface = Corporate_Interface.connect_database();
+                    break;
+                }
             }
         }
     }
