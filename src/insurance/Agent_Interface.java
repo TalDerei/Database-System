@@ -48,20 +48,19 @@ import java.text.*;
      * Establish a connection to the Oracle database
      */
     public static Agent_Interface connect_database() {
-        String username = "tad222";
-        String password = "sailcreator1";
-        // try {
-        //     Scanner input = new Scanner(System.in);
-        //     System.out.print("enter Oracle user id: ");   
-        //     username = input.nextLine();
-        //     System.out.print("enter Oracle password for " + username + ": ");
-        //     password = input.nextLine();    
-        // }
-        // catch (InputMismatchException inputMismatchException) {
-        //     System.out.println("Wrong credentials! Try Again!");
-        //     return null;
-        // }
-        
+        String username = "";
+        String password = "";
+        try {
+            Scanner input = new Scanner(System.in);
+            System.out.print("enter Oracle user id: ");   
+            username = input.nextLine();
+            System.out.print("enter Oracle password for " + username + ": ");
+            password = input.nextLine();    
+        }
+        catch (InputMismatchException inputMismatchException) {
+            System.out.println("Wrong credentials! Try Again!");
+            return null;
+        }    
         Agent_Interface database = new Agent_Interface();
         try (Connection connection = DriverManager.getConnection("jdbc:oracle:thin:@edgar1.cse.lehigh.edu:1521:cse241",username,password);
         ) {
@@ -80,7 +79,7 @@ import java.text.*;
      */
     public static void Agent(Agent_Interface database) {
        /**
-         * Prepared Statements for agent interface
+         * Cached Prepared Statements for agent interface
          */
         try {
             database.checkAgentID = database.connect.prepareStatement("SELECT agent_id FROM agent WHERE agent_id = ?");
@@ -239,6 +238,9 @@ import java.text.*;
                             System.out.println("Update Policy Status: [1] Pending, [2] Active, [3] Inactive");
                             String policy_status = IOManager.policyStatus(1);
                             database.updateCustomerPolicy(policy_id, intPlaceHolder, policy_status, index);
+                        }
+                        else {
+                            System.out.println("Invalid Policy ID! Try Again!");
                         }
                     }
                     

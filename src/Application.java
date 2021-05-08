@@ -25,7 +25,7 @@ public class Application {
         System.out.println("[1] Customer Interface\n");
         System.out.println("[2] Agent Interface\n");
         System.out.println("[3] Adjuster Interface\n");
-        System.out.println("[4] Corporate Management Interface");
+        System.out.println("[4] Corporate Interface");
         System.out.println("**************************************************************");
         int interfaces;
         while (true) {

@@ -52,20 +52,19 @@ import insurance.IOManager;
      * Establish a connection to the Oracle database
      */
     public static Customer_Interface connect_database() {
-        String username = "tad222";
-        String password = "sailcreator1";
-        // try {
-        //     Scanner input = new Scanner(System.in);
-        //     System.out.print("enter Oracle user id: ");   
-        //     username = input.nextLine();
-        //     System.out.print("enter Oracle password for " + username + ": ");
-        //     password = input.nextLine();    
-        // }
-        // catch (InputMismatchException inputMismatchException) {
-        //     System.out.println("Wrong credentials! Try Again!");
-        //     return null;
-        // }
-        
+        String username = "";
+        String password = "";
+        try {
+            Scanner input = new Scanner(System.in);
+            System.out.print("enter Oracle user id: ");   
+            username = input.nextLine();
+            System.out.print("enter Oracle password for " + username + ": ");
+            password = input.nextLine();    
+        }
+        catch (InputMismatchException inputMismatchException) {
+            System.out.println("Wrong credentials! Try Again!");
+            return null;
+        }
         Customer_Interface database = new Customer_Interface();
         try (Connection connection = DriverManager.getConnection("jdbc:oracle:thin:@edgar1.cse.lehigh.edu:1521:cse241",username,password);
         ) {
@@ -81,11 +80,11 @@ import insurance.IOManager;
     }
 
     /**
-     * CLI for Customer Interface
+     * Command-line interface for customer
      */
     public static void Customer(Customer_Interface database) {
         /**
-         * Prepared Statements for customer interface
+         * Cached Prepared Statements for customer interface
          */
         try {
             database.createCustomer = database.connect.prepareStatement("INSERT INTO customer (CUSTOMER_ID, NAME, SOCIAL_SECURITY, EMAIL, ZIP_CODE, CITY, STATE, ADDRESS, DATE_OF_BIRTH, PHONE_NUMBER) VALUES (?,?,?,?,?,?,?,?,?,?)");
@@ -408,6 +407,8 @@ import insurance.IOManager;
                                     System.out.println("DON'T FORGET TO WRITE DOWN YOUR UNIQUE POLICY ID SO YOU DON'T FORGET IT!");
                                     System.out.println("YOU'LL NEED THIS TO MAKE FUTURE INQUIRIES ASSOCIATED WITH OUTSTANDING POLICY/CLAIMS!");
                                     System.out.println("YOUR UNIQUE POLICY ID IS: " + policy_id + "\n");
+                                    System.out.println("\n");
+                                    System.out.println("AND DON'T FORGET TO ADD DEPENDANTS TO YOUR POLICY IF YOU HAVE DEPENDANTS!\n");
                                 }
                                 else if (menue_selection == 4) {
                                     int policy_id = IOManager.idNumber(999999);
@@ -473,6 +474,8 @@ import insurance.IOManager;
                                     System.out.println("DON'T FORGET TO WRITE DOWN YOUR UNIQUE POLICY ID SO YOU DON'T FORGET IT!");
                                     System.out.println("YOU'LL NEED THIS TO MAKE FUTURE INQUIRIES ASSOCIATED WITH OUTSTANDING POLICY/CLAIMS!");
                                     System.out.println("YOUR UNIQUE POLICY ID IS: " + policy_id + "\n");
+                                    System.out.println("\n");
+                                    System.out.println("AND DON'T FORGET TO ADD DEPENDANTS TO YOUR POLICY IF YOU HAVE DEPENDANTS!\n");
                                 }
                                 else {
                                     System.out.println("Invalid Input! Try Again!");

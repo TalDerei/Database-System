@@ -613,4 +613,24 @@ public class IOManager {
         }
         return planCategory;
     }
+
+    /**
+     * Input checking constraints on banks
+     */
+    public static String ClaimStatus(int max) {
+        String planCategory;
+        Scanner input = new Scanner(System.in);
+        int condition_value = user_integer(max);
+        if (condition_value == 1) {
+            planCategory = "Accepted";
+        }
+        else if (condition_value == 2) {
+            planCategory = "Denied";
+        }
+        else {
+            System.out.println("Enter [1] Payed, [2] Not Payed");
+            return bank(max);
+        }
+        return planCategory;
+    }
 }
