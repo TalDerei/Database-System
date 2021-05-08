@@ -1,6 +1,9 @@
 # Database-System
 Custom database system with JDBC API. 
 
+CSE341
+Tal Derei
+
 ## Github
 ```
 https://github.com/TalDerei/Database-System.git
