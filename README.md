@@ -1,6 +1,12 @@
 # Database-System
 Custom database system with JDBC API. 
 
+
+CSE341
+
+Tal Derei
+
+
 ## Github
 ```
 https://github.com/TalDerei/Database-System.git
@@ -8,14 +14,94 @@ https://github.com/TalDerei/Database-System.git
 
 ## Running The Executable
 ```
-java -jar countryGarden.jar
+There are two ways to run the program:
+
+cd /tad222derei/tad222
+java -jar tad222.jar
+
+OR 
+
+cd /tad222derei/tad222
+java Application
 ```
 
 ## Design
-The Country Garden insurance database takes a monolithic approach in it's contruction. Relational Sets were extensively used in association with Entity Sets in order to reduce the computational requires of large 'Natural Join' operations. In that regard, querying a customer id, agent id, adjuster id, policy or claim ids were a function of either computing the natural join of multiple tables or using the 1:1 maping of a relational table where a customer id has an associative customer_policy and customer_claim table for faster lookup times for example. So the point of relationship sets was to reduce the number, size, and frequency of natural join operations. The database was structured around the relationship where an adjuster manages a customer's policy, and that agent communicates directly with an adjuster who manages the policy claim (if there exists one). Customers have a one dedicated agent as their main contact, agents can communicate with multiple adjusters, and an adjuster can manage multiple claims. A claim can only be associated with one customer (and their dependants) and one policy at any given time. At the higher levels of management, a Corperate entitity rules over all the employees (agents and adjusters) and can use the relational schema to construct performance and monetary reports. It's important to note that for now, the corperate interface was NOT implemented (but doing so is relatively trivial and is a function of JOINING various fields on multiple inter-related tables). Instead, only the Customer, Agent, and Adjuster interfaces were implemented for now. In regards to the payment system, policy payments and claim payments were handled isolated with respect to each other. Customers can make policy payments towards to their policy (which for the sake of this insurance company is quoted on an annual basis) either in the form of Debit or Credit payments. Adjusters can make claim payments in the form of Checks or ACH Transfers respectively.
+The Country Garden insurance database takes a monolithic approach in it's contruction. Relational Sets were extensively used in association with Entity Sets in order to reduce the computational requirements of large 'Natural Join' operations. In that regard, querying a customer id, agent id, adjuster id, policy or claim ids were a function of either computing the natural join of multiple tables or using the 1:1 maping from a relationship set where a customer id has an associative customer_policy and customer_claim table for faster lookup times for example. So the point of relationship sets was to reduce the number, size, and frequency of natural join operations, especially as the database gets larger. The database was structured around the relationship where an adjuster manages a customer's policy, and that agent communicates directly with an adjuster who manages the policy claim (if it exists). Customers have one dedicated agent as their main contact, agents can communicate with multiple adjusters, and an adjuster can manage multiple claims. A claim can only be associated with one customer (and their dependants) and one policy at any given time. At the higher levels of management, a Corperate entitity rules over all the employees (agents and adjusters) and can use the corperate interface to construct performance and monetary reports. It's important to note that for now, the corperate interface was NOT implemented (but doing so is relatively trivial and is a function of JOINING various fields on multiple inter-related tables). Instead, only the Customer, Agent, and Adjuster interfaces were implemented. In regards to the payment system, policy payments and claim payments were handled indeendtly with respect to each other. Customers can make policy payments towards to their policy (which for the sake of this insurance company is quoted on an annual basis) either in the form of Debit or Credit payments. Adjusters can make claim payments in the form of Checks or ACH Transfers respectively.
 
-## Code Logic
-The database is encapsulated as a single object, and a single connection is being opened on that object (for each interface respectively). You can only connect to one interface at a time, and when that connection terminates, the resources will be returned to the database and the connection closed. Then that database object has multiple interfaces associated with it, and PreparedStatement are attached to that object as well. The /src directory includes a different file for every interface, and an 'Application' file representing main. The /design directory contains the relational schema, ER diagram, and data_generation files as .sql and .pdf files. 
+## Code Logic and Layout
+The database is encapsulated as a single object, and a single connection is being opened on that object (for each interface respectively). You can only connect to one interface at a time, and when that connection terminates, the resources will be returned to the database and the connection closed. Then that database object has multiple interfaces associated with it, and PreparedStatement are attached to that object as well. The /countyGarden directory includes a different java file for each interface, and an 'Application' java file representing main. The /design directory contains the relational schema, ER diagram, and data_generation files as .sql and .pdf files. And the /tad222 directory contains the executable .jar file and the binary executables. It's important to note that the .class files in /tad222 are structured where Application.class is the top-level 'main' function in /tad222, and the .class files (for the interfaces) are in the         /insurance directory as a package. 
+
+### Code Generation
+SQL Data Generator in dbForge Studio for Oracle Server - Devart
+https://www.devart.com/dbforge/oracle/studio/data-generator.html
+
+## Interfaces 
+
+### Customer Interface
+
+The Customer Interface was designed to allow customers to create user profiles, add new insurance policies (home, auto, insurance, and life) to existing customer profiles, and add claims on existing policies. If a customer does not exist, a new insurance policy cannot be created. If a policy does not exist, a new claim cannot be created for that policy. One of the main contemplations for the customer interface was whether attributes like 'deductible' or 'cost' should be included in the policy table. Should a customer be expected to know the policy's deductible and/or cost when adding a policy to the database via the customer interface? On the other hand, contemplating whether a customer can only add their personal information, and only an agent can enter a customer policy into the database by interacting with the agent interface (in which case I would keep 'deductible' and 'cost' in the policy schema). Ultimately, it depends on how the database is structured and what functionality we associate with the different interfaces. The database implements the former design, allowing users to create policies that have to be potentially fixed (and approved) by agents. 
+
+A customer can interface with the database with the following options:
+
+```
+[1] Create a New Customer Profile
+[2] Add a Policy
+[3] Drop a Policy
+[4] Add a Claim to an Existing Policy
+[5] Make a Policy Payment
+[6] Get All Information on an Existing Policy
+[7] Check Claim Status Associated With a Claim
+[8] Add Dependant to Policy
+[9] Add/Drop a Vehicle Associated with a Auto Insurance Policy
+[10] Exit
+```
+
+### Agent Interface
+
+The Agent Interface was designed to allow agents to reviews customer policies and update them as neccessary. Since agents SHOULD be able to do everything a customer can, I left out all of the functionality in the customer interface and instead highlighted the unique features dedicated to agents. Agents deal with everything to do with policies, such as getting information on a customer's specific polcy, updating their policy information, changing their policy status from 'pending' to 'active' or 'inactive', etc. In association, for every customer policy, and agent has a single adjuster they communicate with for that specific policy (as their main form of contact if a user decided to start a claim on a policy).
+
+An agent can interface with the database with the following options:
+
+```
+[1] Get All Customers Associated With a Particular Agent\n");
+[2] Identify Customers With Overdue Bills\n");
+[3] Customers With Pending Claims That Have Not Been Serviced Recently\n");
+[4] Compute the Estimated Revenue Generated by an Agent\n");
+[5] Update a Customer's Policy\n");
+[6] Get All Polcies Associated With a Particular Customer\n"); 
+[7] Get Policy Information Associated With a Customer's Policy\n"); 
+[8] Get All Customers (and Dependants) Associated With a Particular Policy\n"); 
+[9] Get All Adjusters an Agent Communicates With\n");
+[10] Exit
+```
+
+### Adjuster Interface
+
+The Adjuster Interface was designed to allow adjusters to manage evrything to do with policies. Adjusters can update claims, review claims and either 'Deny' or 'Accept' them, change fields in the claim, make claim payments to customers (checks or ACH transfers), etc. In the way the database is currently designed, customer's can only submit top-level claims, but cannot add items to their claim. Only professional adjusters can add the items to a claim request, and then decide whether to accept or reject that request.
+
+An adjuster can interface with the database with the following options:
+
+```
+[1] Get all customers associated with an adjusters
+[2] Identify claims that have not been serviced recently
+[3] Update a customer's claim
+[4] Get all claims associated with a particular customer 
+[5] Get claim information associated with a customer's claim
+[6] Get all customers (and dependants) associated with a particular claim
+[7] Get all agents an adjuster communicates with
+[8] Get all claims an adjuster manages
+[9] Assign external remediation firms or body shops to claims
+[10] Add an item to an existing claim request
+[11] Get All Items in a Claim
+[12] Make a Claim Payment to a Particular Customer on a Policy
+[13] Exit!
+```
+
+## Testing Patterns
+
+Customers can create new profiles, policies, and claims on existing policies. Each generates a unique identifier that uniquely identifies that customer, policy, and claim (i.e. cannot have any customer/policy/claim with the same ID). The database currently prints out the unique identifier and prompts the user to write down their unique identifiers in order to use them later on. I could have easily (and just as simply) printed it out to the console everytime they log in. 
+
+In order to test, use exsiting profiles comprised of customer_id, policy_id, claim_id fields found in the 'customer', 'policy', and 'claim' relations in the database. This is a good starting point before creating your own customer profile, policy and claim requests. 
 
 ## Assumptions
 Throughout the development of the database, there were various assumptions made in regards to the design choices of different components. 
