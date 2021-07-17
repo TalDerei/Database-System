@@ -56,29 +56,33 @@ public class Adjuster_Interface {
      * Establish a connection to the Oracle database
      */
     public static Adjuster_Interface connect_database() {
-        String username = "";
-        String password = "";
-        try {
-            Scanner input = new Scanner(System.in);
-            System.out.print("enter Oracle user id: ");   
-            username = input.nextLine();
-            System.out.print("enter Oracle password for " + username + ": ");
-            password = input.nextLine();    
-        }
-        catch (InputMismatchException inputMismatchException) {
-            System.out.println("Wrong credentials! Try Again!");
-            return null;
-        }
+        String url = "jdbc:postgresql://ec2-52-1-20-236.compute-1.amazonaws.com:5432/dfocu1cnfk70bl";
+        String username = "ezdvczoxegzrgf";
+        String password = "e620a6a42fb3d6b0dd4d628325d441386eb62ccd53eee2439aa7b86c9caa91ed";
+        // try {
+        //     Scanner input = new Scanner(System.in);
+        //     System.out.print("enter postgres username: ");   
+        //     username = input.nextLine();
+        //     System.out.print("enter postgres password for " + username + ": ");
+        //     password = input.nextLine();    
+        // }
+        // catch (InputMismatchException inputMismatchException) {
+        //     System.out.println("Wrong credentials! Try Again!");
+        //     return null;
+        // }
         Adjuster_Interface database = new Adjuster_Interface();
-        try (Connection connection = DriverManager.getConnection("jdbc:oracle:thin:@edgar1.cse.lehigh.edu:1521:cse241",username,password);
+
+        try (Connection connection = DriverManager.getConnection(url, username, password)
         ) {
-            System.out.println("Connection to the oracle database succeeded!\n");
-            database.connect = connection;      
-            Adjuster(database); 
+            System.out.println("Connected to the PostgreSQL server successfully.");
+            connection.setAutoCommit(false);
+            database.connect = connection;   
+            Adjuster(database);         
         } catch (SQLException exception) {
-            System.out.println("connection to the oracle database failed! Try again!");
+            System.out.println("\nConnection to the postgres database failed! Try again!\n");
             return connect_database();
         }
+
         return database;
     }
 
