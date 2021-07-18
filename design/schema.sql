@@ -163,6 +163,7 @@ create table checks(
     check_number numeric(9,0),
     check_date varchar(10),
     claim_id numeric(6,0),
+    bank varchar(10),
     account_number numeric(12,0),
     routing_number numeric(9,0),
     primary key (payment_id, claim_id),

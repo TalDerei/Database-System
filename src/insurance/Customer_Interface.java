@@ -1436,8 +1436,10 @@ import insurance.IOManager;
 
 /**
  * To Do:
- * Transform codebase to object oriented
+ * Makefile for compilation
+ * Remove .class files from github
  * Split up files to finer granularity: DB Manager and IO Manager
+ * Transform codebase to object oriented
  */
 
 
