@@ -10,15 +10,14 @@ package insurance;
 
 import java.util.Scanner;
 import java.sql.Date;
-import java.util.Calendar;
 import java.sql.*;
-import java.util.*;
 import java.text.*;
-import java.util.InputMismatchException;
-import insurance.IOManager;
 
+/**
+ * Adjuster Interface
+ */
 public class Adjuster_Interface {
-     /**
+    /**
      * Prepared Statments associated with adjuster interface
      */
     public Connection connect;
@@ -53,76 +52,45 @@ public class Adjuster_Interface {
     public PreparedStatement checkClaimCost;
 
     /**
-     * Establish a connection to the Oracle database
-     */
-    public static Adjuster_Interface connect_database() {
-        String url = "jdbc:postgresql://ec2-52-1-20-236.compute-1.amazonaws.com:5432/dfocu1cnfk70bl";
-        String username = "ezdvczoxegzrgf";
-        String password = "e620a6a42fb3d6b0dd4d628325d441386eb62ccd53eee2439aa7b86c9caa91ed";
-        // try {
-        //     Scanner input = new Scanner(System.in);
-        //     System.out.print("enter postgres username: ");   
-        //     username = input.nextLine();
-        //     System.out.print("enter postgres password for " + username + ": ");
-        //     password = input.nextLine();    
-        // }
-        // catch (InputMismatchException inputMismatchException) {
-        //     System.out.println("Wrong credentials! Try Again!");
-        //     return null;
-        // }
-        Adjuster_Interface database = new Adjuster_Interface();
-
-        try (Connection connection = DriverManager.getConnection(url, username, password)
-        ) {
-            System.out.println("Connected to the PostgreSQL server successfully.");
-            connection.setAutoCommit(false);
-            database.connect = connection;   
-            Adjuster(database);         
-        } catch (SQLException exception) {
-            System.out.println("\nConnection to the postgres database failed! Try again!\n");
-            return connect_database();
-        }
-
-        return database;
-    }
-
-    /**
      * Command-line interface for adjusters
+     * @param database Connection object
      */
-    public static void Adjuster(Adjuster_Interface database) {
+    public static void Adjuster(Connection database) {
+        Adjuster_Interface adjuster = new Adjuster_Interface();
+
         /**
-          * Cached Prepared Statements for adjuster interface
+         * Cached Prepared Statements for adjuster interface
         */
         try {
-            database.checkadjuster = database.connect.prepareStatement("SELECT adjuster_id FROM adjuster WHERE adjuster_id = ?");
-            database.checkAdjusterCustomers = database.connect.prepareStatement("SELECT customer_id FROM adjuster NATURAL JOIN communicates NATURAL JOIN customer_agent WHERE adjuster_id = ?");
-            database.pendingClaims = database.connect.prepareStatement("SELECT customer_id FROM customer NATURAL JOIN claim NATURAL JOIN claim_payment NATURAL JOIN policy WHERE claim_status = 'Pending'");
-            database.checkClaimID = database.connect.prepareStatement("SELECT claim_id FROM claim WHERE claim_id = ?");
-            database.checkCustomerID = database.connect.prepareStatement("SELECT customer_id FROM customer WHERE customer_id = ?");
-            database.checkAdjusterID = database.connect.prepareStatement("SELECT adjuster_id FROM adjuster WHERE adjuster_id = ?");
-            database.changeClaimType = database.connect.prepareStatement("UPDATE claim SET claim_type = ? WHERE claim_id = ?");
-            database.changeClaimAccident = database.connect.prepareStatement("UPDATE claim SET accident = ? WHERE claim_id = ?");
-            database.changeClaimItemsDamaged = database.connect.prepareStatement("UPDATE claim SET items_damaged = ? WHERE claim_id = ?");
-            database.changeClaimDescription = database.connect.prepareStatement("UPDATE claim SET descripion = ? WHERE claim_id = ?");
-            database.changeClaimDecision = database.connect.prepareStatement("UPDATE claim SET decision = ? WHERE claim_id = ?");
-            database.changeClaimAdjusterNotes = database.connect.prepareStatement("UPDATE claim SET adjuster_notes = ? WHERE claim_id = ?");
-            database.changeClaimAmount = database.connect.prepareStatement("UPDATE claim SET amount = ? WHERE claim_id = ?");
-            database.changeClaimStatus = database.connect.prepareStatement("UPDATE claim SET claim_status = ? WHERE claim_id = ?");
-            database.getAllCustomerClaim = database.connect.prepareStatement("SELECT claim_id FROM customer NATURAL JOIN claim NATURAL JOIN claim_payment NATURAL JOIN policy where customer_id = ?");
-            database.getClaimInformation = database.connect.prepareStatement("SELECT * FROM claim WHERE claim_id = ?");
-            database.getAllAdjusterCustomers = database.connect.prepareStatement("SELECT customer_id FROM customer NATURAL JOIN claim NATURAL JOIN claim_payment NATURAL JOIN policy where claim_id = ?");
-            database.adjusterAgent = database.connect.prepareStatement("SELECT agent_id FROM communicates WHERE adjuster_id = ?");
-            database.adjusterManagesClaim = database.connect.prepareStatement("SELECT claim_id FROM manages WHERE employee_id = ?");
-            database.claimOutsources = database.connect.prepareStatement("INSERT INTO outsources (NAME, CLAIM_ID) VALUES (?, ?)");
-            database.claimCompany = database.connect.prepareStatement("INSERT INTO company (NAME, TYPE, PHONE_NUMBER) VALUES (?, ?, ?)");
-            database.claimItem = database.connect.prepareStatement("INSERT INTO item (ITEM_ID, CLAIM_ID, POLICY_ID, ITEM_TYPE, ITEM_VALUE, DESCRIPTION) VALUES (?, ?, ?, ?, ?, ?)");
-            database.ClaimPolicy = database.connect.prepareStatement("SELECT policy_id FROM item (ITEM_ID, CLAIM_ID, POLICY_ID, ITEM_TYPE, ITEM_VALUE, DESCRIPTION) VALUES (?, ?, ?, ?, ?, ?)");
-            database.policyOfClaim = database.connect.prepareStatement("SELECT policy_id FROM claim where claim_id = ?");
-            database.getClaimItems = database.connect.prepareStatement("SELECT item_id FROM item WHERE claim_id = ?");
-            database.addCheck = database.connect.prepareStatement("INSERT INTO checks (PAYMENT_ID, CHECK_NUMBER, CHECK_DATE, CLAIM_ID, BANK, ACCOUNT_NUMBER, ROUTING_NUMBER) VALUES (?, ?, ?, ?, ?, ?, ?)");
-            database.addACHTransfer = database.connect.prepareStatement("INSERT INTO ach_transfer (PAYMENT_ID, ACCOUNT_NUMBER, ROUTING_NUMBER, CLAIM_ID) VALUES (?, ?, ?, ?)");
-            database.claimPayments = database.connect.prepareStatement("INSERT INTO claim_payment (PAYMENT_ID, CLAIM_ID, RECIPIENT_NAME, RECIPIENT_ADDRESS, PAYMENT_AMOUNT, BANK, PAYMENT_DATE, STATUS) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            database.checkClaimCost = database.connect.prepareStatement("SELECT amount FROM claim WHERE claim_id = ?");
+            adjuster.checkadjuster = database.prepareStatement("SELECT adjuster_id FROM adjuster WHERE adjuster_id = ?");
+            adjuster.checkAdjusterCustomers = database.prepareStatement("SELECT customer_id FROM adjuster NATURAL JOIN communicates NATURAL JOIN customer_agent WHERE adjuster_id = ?");
+            adjuster.pendingClaims = database.prepareStatement("SELECT customer_id FROM customer NATURAL JOIN claim NATURAL JOIN claim_payment NATURAL JOIN policy WHERE claim_status = 'Pending'");
+            adjuster.checkClaimID = database.prepareStatement("SELECT claim_id FROM claim WHERE claim_id = ?");
+            adjuster.checkCustomerID = database.prepareStatement("SELECT customer_id FROM customer WHERE customer_id = ?");
+            adjuster.checkAdjusterID = database.prepareStatement("SELECT adjuster_id FROM adjuster WHERE adjuster_id = ?");
+            adjuster.changeClaimType = database.prepareStatement("UPDATE claim SET claim_type = ? WHERE claim_id = ?");
+            adjuster.changeClaimAccident = database.prepareStatement("UPDATE claim SET accident = ? WHERE claim_id = ?");
+            adjuster.changeClaimItemsDamaged = database.prepareStatement("UPDATE claim SET items_damaged = ? WHERE claim_id = ?");
+            adjuster.changeClaimDescription = database.prepareStatement("UPDATE claim SET descripion = ? WHERE claim_id = ?");
+            adjuster.changeClaimDecision = database.prepareStatement("UPDATE claim SET decision = ? WHERE claim_id = ?");
+            adjuster.changeClaimAdjusterNotes = database.prepareStatement("UPDATE claim SET adjuster_notes = ? WHERE claim_id = ?");
+            adjuster.changeClaimAmount = database.prepareStatement("UPDATE claim SET amount = ? WHERE claim_id = ?");
+            adjuster.changeClaimStatus = database.prepareStatement("UPDATE claim SET claim_status = ? WHERE claim_id = ?");
+            adjuster.getAllCustomerClaim = database.prepareStatement("SELECT claim_id FROM customer NATURAL JOIN claim NATURAL JOIN claim_payment NATURAL JOIN policy where customer_id = ?");
+            adjuster.getClaimInformation = database.prepareStatement("SELECT * FROM claim WHERE claim_id = ?");
+            adjuster.getAllAdjusterCustomers = database.prepareStatement("SELECT customer_id FROM customer NATURAL JOIN claim NATURAL JOIN claim_payment NATURAL JOIN policy where claim_id = ?");
+            adjuster.adjusterAgent = database.prepareStatement("SELECT agent_id FROM communicates WHERE adjuster_id = ?");
+            adjuster.adjusterManagesClaim = database.prepareStatement("SELECT claim_id FROM manages WHERE employee_id = ?");
+            adjuster.claimOutsources = database.prepareStatement("INSERT INTO outsources (NAME, CLAIM_ID) VALUES (?, ?)");
+            adjuster.claimCompany = database.prepareStatement("INSERT INTO company (NAME, TYPE, PHONE_NUMBER) VALUES (?, ?, ?)");
+            adjuster.claimItem = database.prepareStatement("INSERT INTO item (ITEM_ID, CLAIM_ID, POLICY_ID, ITEM_TYPE, ITEM_VALUE, DESCRIPTION) VALUES (?, ?, ?, ?, ?, ?)");
+            adjuster.ClaimPolicy = database.prepareStatement("SELECT policy_id FROM item (ITEM_ID, CLAIM_ID, POLICY_ID, ITEM_TYPE, ITEM_VALUE, DESCRIPTION) VALUES (?, ?, ?, ?, ?, ?)");
+            adjuster.policyOfClaim = database.prepareStatement("SELECT policy_id FROM claim where claim_id = ?");
+            adjuster.getClaimItems = database.prepareStatement("SELECT item_id FROM item WHERE claim_id = ?");
+            adjuster.addCheck = database.prepareStatement("INSERT INTO checks (PAYMENT_ID, CHECK_NUMBER, CHECK_DATE, CLAIM_ID, BANK, ACCOUNT_NUMBER, ROUTING_NUMBER) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            adjuster.addACHTransfer = database.prepareStatement("INSERT INTO ach_transfer (PAYMENT_ID, ACCOUNT_NUMBER, ROUTING_NUMBER, CLAIM_ID) VALUES (?, ?, ?, ?)");
+            adjuster.claimPayments = database.prepareStatement("INSERT INTO claim_payment (PAYMENT_ID, CLAIM_ID, RECIPIENT_NAME, RECIPIENT_ADDRESS, PAYMENT_AMOUNT, BANK, PAYMENT_DATE, STATUS) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+            adjuster.checkClaimCost = database.prepareStatement("SELECT amount FROM claim WHERE claim_id = ?");
         }
         catch (SQLException exception) {
             System.out.println("Error with Prepared Statements!");
@@ -148,7 +116,7 @@ public class Adjuster_Interface {
             System.out.println("[10] Add an item to an existing claim request\n");
             System.out.println("[11] Get All Items in a Claim\n");
             System.out.println("[12] Make a Claim Payment to a Particular Customer on a Policy\n");
-            System.out.println("[13] Exit!");
+            System.out.println("[13] Disconnect!");
             System.out.println("--------------------------------------------------------------");
             System.out.print("\nSelect From the List of Options Above: ");
             boolean conditional = input.hasNextInt();
@@ -157,13 +125,13 @@ public class Adjuster_Interface {
                 if (menue_selection == 1) {
                     System.out.print("\nEnter 6-Digit Adjuster ID to Retrieve All Customers Managed By That Adjuster: ");
                     int adjuster_id = user_integer();
-                    success = database.getAdjusterID(adjuster_id);
+                    success = adjuster.getAdjusterID(adjuster_id);
                     if (adjuster_id == success) {
-                        database.getAdjusterCustomers(adjuster_id);
+                        adjuster.getAdjusterCustomers(adjuster_id);
                     }
                 }
                 else if (menue_selection == 2) {
-                    database.getPendingClaim();
+                    adjuster.getPendingClaim();
                 }
                 else if (menue_selection == 3) {
                     int index;
@@ -171,7 +139,7 @@ public class Adjuster_Interface {
                     String stringPlaceHolder = "";
                     System.out.print("Please Enter an Existing 6-digit Claim ID To Update the Claim: ");
                     int claim_id = user_integer();
-                    success = database.getClaimID(claim_id);
+                    success = adjuster.getClaimID(claim_id);
                     if (claim_id == success) {
                         System.out.println("");
                         System.out.println("\n--------------------------------------------------------------");
@@ -189,43 +157,43 @@ public class Adjuster_Interface {
                             index = 2;
                             System.out.println("Update Accident: [1] Wind and Hail, [2] Theft, [3] Car Wreck, [4] Health-Related, [5] Personal Injury, [6] ater Damage, [7] Fire Damage ");
                             String accident = IOManager.accident(1);
-                            database.updateCustomerClaim(claim_id, intPlaceHolder, accident, index);
+                            adjuster.updateCustomerClaim(claim_id, intPlaceHolder, accident, index);
                         }
                         else if (menue_selection == 2) {
                             index = 3;
                             System.out.println("Update Items Damaged: ([Y]es or [N]o)");
                             String items_damaged = IOManager.yesOrNo();
-                            database.updateCustomerClaim(claim_id, intPlaceHolder, items_damaged, index);
+                            adjuster.updateCustomerClaim(claim_id, intPlaceHolder, items_damaged, index);
                         }
                         else if (menue_selection == 3) {
                             index = 4;
                             System.out.println("Update Description: ");
                             String description = IOManager.stringInput(255);
-                            database.updateCustomerClaim(claim_id, intPlaceHolder, description, index);
+                            adjuster.updateCustomerClaim(claim_id, intPlaceHolder, description, index);
                         }
                         else if (menue_selection == 4) {
                             index = 5;
                             System.out.println("Update decision: [1] Pending, [2] Active, [3] Inactive ");
                             String decision = IOManager.policyStatus(1);
-                            database.updateCustomerClaim(claim_id, intPlaceHolder, decision, index);
+                            adjuster.updateCustomerClaim(claim_id, intPlaceHolder, decision, index);
                         }
                         else if (menue_selection == 5) {
                             index = 6;
                             System.out.println("Update Adjuster Notes: ");
                             String adjuster_notes = IOManager.stringInput(255);
-                            database.updateCustomerClaim(claim_id, intPlaceHolder, adjuster_notes, index);
+                            adjuster.updateCustomerClaim(claim_id, intPlaceHolder, adjuster_notes, index);
                         }
                         else if (menue_selection == 6) {
                             index = 7;
                             System.out.println("Update Amount: ");
                             double amount = IOManager.intInputDouble(0.00, 999999.99);
-                            database.updateCustomerClaim(claim_id, amount, stringPlaceHolder, index);
+                            adjuster.updateCustomerClaim(claim_id, amount, stringPlaceHolder, index);
                         }
                         else if (menue_selection == 7) {
                             index = 8;
                             System.out.println("Update Status: [1] Pending, [2] Active, [3] Inactive");
                             String status = IOManager.policyStatus(1);
-                            database.updateCustomerClaim(claim_id, intPlaceHolder, status, index);
+                            adjuster.updateCustomerClaim(claim_id, intPlaceHolder, status, index);
                         }
                         else {
                             System.out.println("Invalid Claim ID! Try Again!");
@@ -238,47 +206,47 @@ public class Adjuster_Interface {
                 else if (menue_selection == 4) {
                     System.out.print("Enter Existing Customer ID: ");
                     int customer_id = user_integer();
-                    success = database.getCustomerID(customer_id);
+                    success = adjuster.getCustomerID(customer_id);
                     if (customer_id == success) {
-                        database.getAllCustomerClaimList(customer_id);
+                        adjuster.getAllCustomerClaimList(customer_id);
                     }
                 }
                 else if (menue_selection == 5) {
                     System.out.print("Enter Existing Claim ID: ");
                     int claim_id = user_integer();
-                    success = database.getClaimID(claim_id);
+                    success = adjuster.getClaimID(claim_id);
                     if (claim_id == success) {
-                        success = database.getClaimInfo(claim_id);
+                        success = adjuster.getClaimInfo(claim_id);
                     }
                 }
                 else if (menue_selection == 6) {
                     System.out.print("Enter Existing Claim ID: ");
                     int claim_id = user_integer();
-                    success = database.getClaimID(claim_id);
+                    success = adjuster.getClaimID(claim_id);
                     if (claim_id == success) { 
-                        success = database.getAllCustomersClaim(claim_id);
+                        success = adjuster.getAllCustomersClaim(claim_id);
                     }
                 }
                 else if (menue_selection == 7) {
                     System.out.print("Enter Existing Adjuster ID: ");
                     int adjuster_id = user_integer();
-                    success = database.getAdjusterID(adjuster_id);
+                    success = adjuster.getAdjusterID(adjuster_id);
                     if (adjuster_id == success) { 
-                        success = database.getAgentAdjuster(adjuster_id);
+                        success = adjuster.getAgentAdjuster(adjuster_id);
                     }
                 }
                 else if (menue_selection == 8) {
                     System.out.print("Enter Existing Adjuster ID: ");
                     int adjuster_id = user_integer();
-                    success = database.getAdjusterID(adjuster_id);
+                    success = adjuster.getAdjusterID(adjuster_id);
                     if (adjuster_id == success) { 
-                        success = database.getAdjusterManages(adjuster_id);
+                        success = adjuster.getAdjusterManages(adjuster_id);
                     }
                 }
                 else if (menue_selection == 9) {
                     System.out.print("Enter Existing Claim ID: ");
                     int claim_id = user_integer();
-                    success = database.getClaimID(claim_id);
+                    success = adjuster.getClaimID(claim_id);
                     if (claim_id == success) { 
                         System.out.print("Company Name: ");
                         String name = IOManager.stringInputWithoutNumbers(30);
@@ -286,11 +254,11 @@ public class Adjuster_Interface {
                         String type = IOManager.policyType(1);
                         System.out.print("Company Contact Information (Phone Number): ");
                         String phone_number = IOManager.validPhoneNumber(10);
-                        int success2 = database.adjusterCompany(name, type, phone_number);
-                        int success1 = database.adjusterOutsourcing(claim_id, name);
+                        int success2 = adjuster.adjusterCompany(name, type, phone_number);
+                        int success1 = adjuster.adjusterOutsourcing(claim_id, name);
                         try{
                             if (success1 + success2 == 2) {
-                                database.connect.commit();
+                                database.commit();
                                 System.out.println("TRANSACTION SUCCEEDED!\n");
                             }
                         }
@@ -301,33 +269,33 @@ public class Adjuster_Interface {
                 else if (menue_selection == 10) {
                     System.out.print("Enter Existing Claim ID: ");
                     int claim_id = user_integer();
-                    success = database.getClaimID(claim_id);
+                    success = adjuster.getClaimID(claim_id);
                     if (claim_id == success) {
                         int item_id = IOManager.idNumber(999999);
-                        int policy_id = database.getPolicyClaim(claim_id);
+                        int policy_id = adjuster.getPolicyClaim(claim_id);
                         System.out.print("Company Item Type: ");
                         String item_type = IOManager.stringInputWithoutNumbers(20);
                         System.out.print("Company Item Value: ");
                         double item_value = IOManager.intInputDouble(0.00, 999999.99);
                         System.out.print("Company Item Description: ");
                         String description = IOManager.stringInput(255);
-                        database.insertClaimItem(item_id, claim_id, policy_id, item_type, item_value, description);
+                        adjuster.insertClaimItem(item_id, claim_id, policy_id, item_type, item_value, description);
                     }
                 }
                 else if (menue_selection == 11) {
                     System.out.print("Enter Existing Claim ID: ");
                     int claim_id = user_integer();
-                    success = database.getClaimID(claim_id);
+                    success = adjuster.getClaimID(claim_id);
                     if (claim_id == success) {
-                        database.retrieveClaimItems(claim_id);
+                        adjuster.retrieveClaimItems(claim_id);
                     }
                 }
                 else if (menue_selection == 12) {
                     System.out.print("Enter Existing Claim ID to Make a Payment: ");
                     int claim_id = user_integer();
-                    int success_value = database.getClaimID(claim_id);
+                    int success_value = adjuster.getClaimID(claim_id);
                     if (success_value == claim_id) {
-                        double payment_amount = database.getClaimCost(claim_id);
+                        double payment_amount = adjuster.getClaimCost(claim_id);
                         if (payment_amount != 0) {
                             System.out.println("How Would You Like To Pay? \n");
                             System.out.println("[1] Checks\n");
@@ -353,17 +321,17 @@ public class Adjuster_Interface {
                                         } 
                                         System.out.println("Enter Status: [1] Payed, [2] Not Payed");
                                         String status = IOManager.ClaimStatus(1);
-                                        int success1 = database.makeClaimPayment(payment_id, claim_id, recipient_name, recipient_address, payment_amount, bank, payment_date, status);
+                                        int success1 = adjuster.makeClaimPayment(payment_id, claim_id, recipient_name, recipient_address, payment_amount, bank, payment_date, status);
                                         int check_number = IOManager.idNumber(999999);
                                         String check_date = payment_date;
                                         System.out.println("Enter Account Number: ");
                                         long account_number = IOManager.intInputLong(12);
                                         System.out.println("Enter Routing Number: ");
                                         long routing_number = IOManager.intInputLong(9);
-                                        int success2 = database.checkPayment(payment_id, check_number, check_date, claim_id, bank, account_number, routing_number);
+                                        int success2 = adjuster.checkPayment(payment_id, check_number, check_date, claim_id, bank, account_number, routing_number);
                                         try{
                                             if (success1 + success2 == 2) {
-                                                database.connect.commit();
+                                                database.commit();
                                                 System.out.println("Have A Nice Day!\n");
                                                 System.exit(0);
                                             }
@@ -391,15 +359,15 @@ public class Adjuster_Interface {
                                         } 
                                         System.out.println("Enter Status: [1] Payed, [2] Not Payed");
                                         String status = IOManager.ClaimStatus(1);
-                                        int success1 = database.makeClaimPayment(payment_id, claim_id, recipient_name, recipient_address, payment_amount, bank, payment_date, status);
+                                        int success1 = adjuster.makeClaimPayment(payment_id, claim_id, recipient_name, recipient_address, payment_amount, bank, payment_date, status);
                                         System.out.println("Enter Account Number: ");
                                         long account_number = IOManager.intInputLong(12);
                                         System.out.println("Enter Routing Number: ");
                                         long routing_number = IOManager.intInputLong(9);
-                                        int success2 = database.makeACHTransfer(payment_id, account_number, routing_number, claim_id);
+                                        int success2 = adjuster.makeACHTransfer(payment_id, account_number, routing_number, claim_id);
                                         try{
                                             if (success1 + success2 == 2) {
-                                                database.connect.commit();
+                                                database.commit();
                                                 System.out.println("Have A Nice Day!\n");
                                                 System.exit(0);
                                             }

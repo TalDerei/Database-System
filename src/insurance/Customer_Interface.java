@@ -13,13 +13,11 @@ import java.text.*;
 import java.util.Scanner;
 import java.time.LocalDate;
 import java.util.Calendar;
-import java.util.InputMismatchException;
-import insurance.IOManager;
 
-    /**
-     * Customer Interface
-     */
-    public class Customer_Interface {
+/**
+ * Customer Interface
+ */
+public class Customer_Interface {
 
     /**
      * Prepared Statments associated with customer interface
@@ -49,70 +47,37 @@ import insurance.IOManager;
     public PreparedStatement dropAdditionalVehicle;
 
     /**
-     * Establish a connection to the Oracle database
+     * Command-line interface for customers
+     * @param database Connection object
      */
+    public static void Customer(Connection database) {
+        Customer_Interface customer = new Customer_Interface();
 
-
-    public static Customer_Interface connect_database() {
-        String url = "jdbc:postgresql://ec2-52-1-20-236.compute-1.amazonaws.com:5432/dfocu1cnfk70bl";
-        String username = "ezdvczoxegzrgf";
-        String password = "e620a6a42fb3d6b0dd4d628325d441386eb62ccd53eee2439aa7b86c9caa91ed";
-        // try {
-        //     Scanner input = new Scanner(System.in);
-        //     System.out.print("enter postgres username: ");   
-        //     username = input.nextLine();
-        //     System.out.print("enter postgres password for " + username + ": ");
-        //     password = input.nextLine();    
-        // }
-        // catch (InputMismatchException inputMismatchException) {
-        //     System.out.println("Wrong credentials! Try Again!");
-        //     return null;
-        // }
-        Customer_Interface database = new Customer_Interface();
-
-        try (Connection connection = DriverManager.getConnection(url, username, password)
-        ) {
-            System.out.println("Connected to the PostgreSQL server successfully.");
-            connection.setAutoCommit(false);
-            database.connect = connection;   
-            Customer(database);         
-        } catch (SQLException exception) {
-            System.out.println("\nConnection to the postgres database failed! Try again!\n");
-            return connect_database();
-        }
-
-        return database;
-    }
-
-    /**
-     * Command-line interface for customer
-     */
-    public static void Customer(Customer_Interface database) {
         /**
          * Cached Prepared Statements for customer interface
          */
         try {
-            database.createCustomer = database.connect.prepareStatement("INSERT INTO customer (CUSTOMER_ID, NAME, SOCIAL_SECURITY, EMAIL, ZIP_CODE, CITY, STATE, ADDRESS, DATE_OF_BIRTH, PHONE_NUMBER) VALUES (?,?,?,?,?,?,?,?,?,?)");
-            database.checkCustomerID = database.connect.prepareStatement("SELECT customer_id FROM customer WHERE customer_id = ?");
-            database.addPolicy = database.connect.prepareStatement("INSERT INTO policy (CUSTOMER_ID, POLICY_ID, TYPE, COST, COVERAGE, DEDUCTIBLE, COINSURANCE, EFFECTIVE_DATE, EXPIRE_DATE, PLAN, POLICY_STATUS) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            database.addHomeInsurance = database.connect.prepareStatement("INSERT INTO home_insurance (POLICY_ID, CITY, STATE, ZIP_CODE, ADDRESS, YEAR_BUILT, CONDITION, SQUARE_FOOT, LOT_SIZE, CREDIT_SCORE, MORTGAGE_PAYMENT, MARKET_VALUE, PERSONAL_PROPERTY_REPLACEMENT, PLAN_CATEGORY) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            database.addAutoInsurance = database.connect.prepareStatement("INSERT INTO auto_insurance (POLICY_ID, YEAR, MAKE, MODEL, VIN, LICENSE_PLATE, DRIVER_LICENSE, TOTAL_MILEAGE, ANNUAL_MILES, MARKET_VALUE, AGE, GENDER, CREDIT_SCORE, NUMBER_OF_DEPENDANTS, TRAFFIC_VIOLATIONS, STATE, PLAN_CATEGORY) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            database.addHealthInsurance = database.connect.prepareStatement("INSERT INTO health_insurance (POLICY_ID, PLAN_CATEGORY, OUT_OF_POCKET_MAXIMUM, TOBACCO_USE, AGE, PRE_EXISTING_CONDITIONS, NUMBER_OF_DEPENDANTS, ESTIMATED_COPAY) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            database.addLifeInsurance = database.connect.prepareStatement("INSERT INTO life_insurance (POLICY_ID, PLAN_CATEGORY, AGE, GENDER, TOBACCO_USE, OCCUPATION, MEDICAL_STATUS, FAMILY_MEDICAL_HISTORY, BENEFICIARY_NAME, BENEFICIARY_SOCIAL_SECURITY) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            database.dropPolicy = database.connect.prepareStatement("DELETE FROM policy WHERE policy_id = ?");
-            database.addClaim = database.connect.prepareStatement("INSERT INTO claim (CLAIM_ID, CLAIM_TYPE, ACCIDENT, ITEMS_DAMAGED, DESCRIPTION, DECISION, ADJUSTER_NOTES, AMOUNT, CLAIM_STATUS, POLICY_ID) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            database.checkPolicyCost = database.connect.prepareStatement("SELECT cost FROM policy WHERE policy_id = ?");
-            database.checkPolicyDate = database.connect.prepareStatement("SELECT effective_date, expire_date FROM policy WHERE policy_id = ?");
-            database.policyPayment = database.connect.prepareStatement("INSERT INTO policy_payment (PAYMENT_ID, POLICY_ID, RECIPIENT_NAME, RECIPIENT_ADDRESS, BANK, PAYMENT_AMOUNT, PAYMENT_DATE, STATUS) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            database.addDebitCard = database.connect.prepareStatement("INSERT INTO debit (PAYMENT_ID, TYPE, CARD_NUMBER, CVV, POLICY_ID, EXPIARY_DATE) VALUES (?, ?, ?, ?, ?, ?)");
-            database.addCreditCard = database.connect.prepareStatement("INSERT INTO credit (PAYMENT_ID, TYPE, CARD_NUMBER, CVV, POLICY_ID, EXPIARY_DATE) VALUES (?, ?, ?, ?, ?, ?)");
-            database.getPolicyInformation = database.connect.prepareStatement("SELECT * FROM policy WHERE policy_id = ?");
-            database.checkClaimID = database.connect.prepareStatement("SELECT claim_id FROM claim WHERE claim_id = ?");
-            database.checkClaimStatus = database.connect.prepareStatement("SELECT decision FROM claim WHERE claim_id = ?");
-            database.checkPolicyID = database.connect.prepareStatement("SELECT policy_id FROM policy WHERE policy_id = ?");
-            database.addDependant = database.connect.prepareStatement("INSERT INTO dependant (DEPENDANT_ID, POLICY_ID, NAME, SOCIAL_SECURITY, DATE_OF_BIRTH) VALUES (?, ?, ?, ?, ?)");
-            database.addAdditionalVehicle = database.connect.prepareStatement("INSERT INTO vehicle (POLICY_ID, VEHICLE_ID, EXTRA_VEHICLE, YEAR, MAKE, MODEL, VIN, LICENSE_PLATE, TOTAL_MILEAGE, ANNUAL_MILES, MARKET_VALUE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            database.dropAdditionalVehicle = database.connect.prepareStatement("DELETE FROM vehicle WHERE vehicle_id = ?");
+            customer.createCustomer = database.prepareStatement("INSERT INTO customer (CUSTOMER_ID, NAME, SOCIAL_SECURITY, EMAIL, ZIP_CODE, CITY, STATE, ADDRESS, DATE_OF_BIRTH, PHONE_NUMBER) VALUES (?,?,?,?,?,?,?,?,?,?)");
+            customer.checkCustomerID = database.prepareStatement("SELECT customer_id FROM customer WHERE customer_id = ?");
+            customer.addPolicy = database.prepareStatement("INSERT INTO policy (CUSTOMER_ID, POLICY_ID, TYPE, COST, COVERAGE, DEDUCTIBLE, COINSURANCE, EFFECTIVE_DATE, EXPIRE_DATE, PLAN, POLICY_STATUS) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            customer.addHomeInsurance = database.prepareStatement("INSERT INTO home_insurance (POLICY_ID, CITY, STATE, ZIP_CODE, ADDRESS, YEAR_BUILT, CONDITION, SQUARE_FOOT, LOT_SIZE, CREDIT_SCORE, MORTGAGE_PAYMENT, MARKET_VALUE, PERSONAL_PROPERTY_REPLACEMENT, PLAN_CATEGORY) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            customer.addAutoInsurance = database.prepareStatement("INSERT INTO auto_insurance (POLICY_ID, YEAR, MAKE, MODEL, VIN, LICENSE_PLATE, DRIVER_LICENSE, TOTAL_MILEAGE, ANNUAL_MILES, MARKET_VALUE, AGE, GENDER, CREDIT_SCORE, NUMBER_OF_DEPENDANTS, TRAFFIC_VIOLATIONS, STATE, PLAN_CATEGORY) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            customer.addHealthInsurance = database.prepareStatement("INSERT INTO health_insurance (POLICY_ID, PLAN_CATEGORY, OUT_OF_POCKET_MAXIMUM, TOBACCO_USE, AGE, PRE_EXISTING_CONDITIONS, NUMBER_OF_DEPENDANTS, ESTIMATED_COPAY) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+            customer.addLifeInsurance = database.prepareStatement("INSERT INTO life_insurance (POLICY_ID, PLAN_CATEGORY, AGE, GENDER, TOBACCO_USE, OCCUPATION, MEDICAL_STATUS, FAMILY_MEDICAL_HISTORY, BENEFICIARY_NAME, BENEFICIARY_SOCIAL_SECURITY) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            customer.dropPolicy = database.prepareStatement("DELETE FROM policy WHERE policy_id = ?");
+            customer.addClaim = database.prepareStatement("INSERT INTO claim (CLAIM_ID, CLAIM_TYPE, ACCIDENT, ITEMS_DAMAGED, DESCRIPTION, DECISION, ADJUSTER_NOTES, AMOUNT, CLAIM_STATUS, POLICY_ID) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            customer.checkPolicyCost = database.prepareStatement("SELECT cost FROM policy WHERE policy_id = ?");
+            customer.checkPolicyDate = database.prepareStatement("SELECT effective_date, expire_date FROM policy WHERE policy_id = ?");
+            customer.policyPayment = database.prepareStatement("INSERT INTO policy_payment (PAYMENT_ID, POLICY_ID, RECIPIENT_NAME, RECIPIENT_ADDRESS, BANK, PAYMENT_AMOUNT, PAYMENT_DATE, STATUS) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+            customer.addDebitCard = database.prepareStatement("INSERT INTO debit (PAYMENT_ID, TYPE, CARD_NUMBER, CVV, POLICY_ID, EXPIARY_DATE) VALUES (?, ?, ?, ?, ?, ?)");
+            customer.addCreditCard = database.prepareStatement("INSERT INTO credit (PAYMENT_ID, TYPE, CARD_NUMBER, CVV, POLICY_ID, EXPIARY_DATE) VALUES (?, ?, ?, ?, ?, ?)");
+            customer.getPolicyInformation = database.prepareStatement("SELECT * FROM policy WHERE policy_id = ?");
+            customer.checkClaimID = database.prepareStatement("SELECT claim_id FROM claim WHERE claim_id = ?");
+            customer.checkClaimStatus = database.prepareStatement("SELECT decision FROM claim WHERE claim_id = ?");
+            customer.checkPolicyID = database.prepareStatement("SELECT policy_id FROM policy WHERE policy_id = ?");
+            customer.addDependant = database.prepareStatement("INSERT INTO dependant (DEPENDANT_ID, POLICY_ID, NAME, SOCIAL_SECURITY, DATE_OF_BIRTH) VALUES (?, ?, ?, ?, ?)");
+            customer.addAdditionalVehicle = database.prepareStatement("INSERT INTO vehicle (POLICY_ID, VEHICLE_ID, EXTRA_VEHICLE, YEAR, MAKE, MODEL, VIN, LICENSE_PLATE, TOTAL_MILEAGE, ANNUAL_MILES, MARKET_VALUE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            customer.dropAdditionalVehicle = database.prepareStatement("DELETE FROM vehicle WHERE vehicle_id = ?");
         }
         catch (SQLException exception) {
             System.out.println("Error with Prepared Statements!");
@@ -140,7 +105,7 @@ import insurance.IOManager;
             System.out.println("[7] Check Claim Status Associated With a Claim\n");
             System.out.println("[8] Add Dependant to Policy\n");
             System.out.println("[9] Add/Drop a Vehicle Associated with a Auto Insurance Policy\n");
-            System.out.println("[10] Exit!\n");
+            System.out.println("[10] Disconnect!\n");
             System.out.println("--------------------------------------------------------------");
 
             System.out.print("\nSelect From the List of Options Above: ");
@@ -173,10 +138,10 @@ import insurance.IOManager;
                     String address = IOManager.stringInput(50);
                     System.out.print("Enter Phone Number: ");
                     String phone_number = IOManager.validPhoneNumber(10);
-                    success_value = database.insertCustomer(customer_id, name, social_security, email, zip_code, city, state, address, phone_number, date_of_birth);
+                    success_value = customer.insertCustomer(customer_id, name, social_security, email, zip_code, city, state, address, phone_number, date_of_birth);
                     if (success_value == 1) {
                         try{
-                            database.connect.commit();
+                            database.commit();
                             System.out.println("TRANSACTION SUCCEEDED!\n");
                         }
                         catch (SQLException exception) {
@@ -193,7 +158,7 @@ import insurance.IOManager;
                 else if (menue_selection == 2) {
                     System.out.print("Please Enter an Existing 6-digit Customer ID to Create a New Policy: ");
                     int customer_id = user_integer();
-                    success_value = database.getCustomerID(customer_id);
+                    success_value = customer.getCustomerID(customer_id);
                     if (customer_id == success_value) {
                         while (true) {
                             System.out.println("Select an Insurance Policy From The List Below: \n");
@@ -231,7 +196,7 @@ import insurance.IOManager;
                                         } 
                                         String plan = IOManager.policyPlan(menue_selection);
                                         String policy_status = "Pending";
-                                        int success1 = database.insertGenericPolicy(customer_id, policy_id, type, cost, coverage, deductible, coinsurance, effective_date, expire_date, plan, policy_status);
+                                        int success1 = customer.insertGenericPolicy(customer_id, policy_id, type, cost, coverage, deductible, coinsurance, effective_date, expire_date, plan, policy_status);
                                         System.out.print("\n");
 
                                         System.out.println("Home Insurance");
@@ -262,10 +227,10 @@ import insurance.IOManager;
                                         String personal_property_replacement = IOManager.yesOrNo();
                                         System.out.println("Enter plan category: [1] Home, [2] Apartment, [3] Condo, [4] Townhouse, [5] Flat, [6] Mobile Home");
                                         String plan_category = IOManager.planCategoryHomeInsurance(1);
-                                        int success2 = database.insertHomeInsurance(policy_id, city, state, zip_code, address, year_built, condition, square_foot, lot_size, credit_score, mortgage_payment, market_value, personal_property_replacement, plan_category);
+                                        int success2 = customer.insertHomeInsurance(policy_id, city, state, zip_code, address, year_built, condition, square_foot, lot_size, credit_score, mortgage_payment, market_value, personal_property_replacement, plan_category);
                                         try{
                                             if (success1 + success2 == 2) {
-                                                database.connect.commit();
+                                                database.commit();
                                                 System.out.println("TRANSACTION SUCCEEDED!\n");
                                             }
                                         }
@@ -300,7 +265,7 @@ import insurance.IOManager;
                                     } 
                                     String plan = IOManager.policyPlan(menue_selection);
                                     String policy_status = "Pending";
-                                    int success3 = database.insertGenericPolicy(customer_id, policy_id, type, cost, coverage, deductible, coinsurance, effective_date, expire_date, plan, policy_status);
+                                    int success3 = customer.insertGenericPolicy(customer_id, policy_id, type, cost, coverage, deductible, coinsurance, effective_date, expire_date, plan, policy_status);
                                     System.out.print("\n");
 
                                     System.out.print("Enter Year Built: ");
@@ -339,10 +304,10 @@ import insurance.IOManager;
                                     String state = IOManager.stringInputWithoutNumbers(20); 
                                     System.out.print("Enter Policy Category [1] Collision, [2] Motorist, [3] Liability, [4] Comprehensive, [5] Personal Injury: ");
                                     String plan_category = IOManager.planCategoryAutoInsurance(1);
-                                    int success4 = database.insertAutoInsurance(policy_id, year, make, model, vin, license_plate, driver_license, total_mileage, annual_miles, market_value, date_of_birth, gender, credit_score, traffic_violations, number_of_dependants, state, plan_category);
+                                    int success4 = customer.insertAutoInsurance(policy_id, year, make, model, vin, license_plate, driver_license, total_mileage, annual_miles, market_value, date_of_birth, gender, credit_score, traffic_violations, number_of_dependants, state, plan_category);
                                     try{
                                         if (success3 + success4 == 2) {
-                                            database.connect.commit();
+                                            database.commit();
                                             System.out.println("TRANSACTION SUCCEEDED!\n");
                                         }
                                     }
@@ -377,7 +342,7 @@ import insurance.IOManager;
                                     } 
                                     String plan = IOManager.policyPlan(menue_selection);
                                     String policy_status = "Pending";
-                                    int success5 = database.insertGenericPolicy(customer_id, policy_id, type, cost, coverage, deductible, coinsurance, effective_date, expire_date, plan, policy_status);
+                                    int success5 = customer.insertGenericPolicy(customer_id, policy_id, type, cost, coverage, deductible, coinsurance, effective_date, expire_date, plan, policy_status);
                                     System.out.print("\n");
                                     
                                     System.out.print("Enter Policy Category [1] Collision, [2] Motorist, [3] Liability, [4] Comprehensive, [5] Personal Injury: ");
@@ -399,10 +364,10 @@ import insurance.IOManager;
                                     int number_of_dependants = IOManager.intInput(0, 9, 1);
                                     System.out.println("Enter Estimated Copay: ");
                                     double estimated_copay = IOManager.intInputDouble(0.00, 9999.99);
-                                    int success6 = database.insertHealthInsurance(policy_id, plan_category, out_of_pocket_maximum, tobacco_use, age, pre_existing_conditions, number_of_dependants, estimated_copay);
+                                    int success6 = customer.insertHealthInsurance(policy_id, plan_category, out_of_pocket_maximum, tobacco_use, age, pre_existing_conditions, number_of_dependants, estimated_copay);
                                     try{
                                         if (success5 + success6 == 2) {
-                                            database.connect.commit();
+                                            database.commit();
                                             System.out.println("TRANSACTION SUCCEEDED!\n");
                                         }
                                     }
@@ -439,7 +404,7 @@ import insurance.IOManager;
                                     } 
                                     String plan = IOManager.policyPlan(menue_selection);
                                     String policy_status = "Pending";
-                                    int success7 = database.insertGenericPolicy(customer_id, policy_id, type, cost, coverage, deductible, coinsurance, effective_date, expire_date, plan, policy_status);
+                                    int success7 = customer.insertGenericPolicy(customer_id, policy_id, type, cost, coverage, deductible, coinsurance, effective_date, expire_date, plan, policy_status);
                                     System.out.print("\n");
 
                                     System.out.print("Enter Policy Category: [1] Whole Life, [2] Universal Life, [3] Term Life");
@@ -465,11 +430,11 @@ import insurance.IOManager;
                                     String beneficiary_name = IOManager.stringInputWithoutNumbers(30);
                                     System.out.print("Enter Primary Benefiary Social Security: ");
                                     int beneficiary_social_security = IOManager.intInput(100000000, 999999999, 9);
-                                    int success8 = database.insertLifeInsurance(policy_id, plan_category, age, gender, tobacco_use, occupation, medical_status, family_medical_history, beneficiary_name, beneficiary_social_security);
+                                    int success8 = customer.insertLifeInsurance(policy_id, plan_category, age, gender, tobacco_use, occupation, medical_status, family_medical_history, beneficiary_name, beneficiary_social_security);
                                     
                                     try{
                                         if (success7 + success8 == 2) {
-                                            database.connect.commit();
+                                            database.commit();
                                             System.out.println("TRANSACTION SUCCEEDED!\n");
                                         }
                                     }
@@ -500,9 +465,9 @@ import insurance.IOManager;
                 else if (menue_selection == 3) {
                     System.out.print("Enter an existing policy ID to drop the policy: ");
                     int policy_id = user_integer();
-                    success_value = database.getPolicyID(policy_id);
+                    success_value = customer.getPolicyID(policy_id);
                     if (policy_id == success_value) {
-                        success_value = database.deletePolicy(policy_id);
+                        success_value = customer.deletePolicy(policy_id);
                         System.out.println("Successfully Deleted Policy!\n");
                     }
                     else {
@@ -515,7 +480,7 @@ import insurance.IOManager;
                 else if (menue_selection == 4) {
                     System.out.print("Enter an Existing Policy ID to Start a Claim: ");
                     int policy_id = user_integer();
-                    success_value = database.getPolicyID(policy_id);
+                    success_value = customer.getPolicyID(policy_id);
                     if (policy_id == success_value) {
                         int claim_id = IOManager.idNumber(999999);
                         String claim_type = IOManager.policyPlan(1);
@@ -531,10 +496,10 @@ import insurance.IOManager;
                         System.out.print("Enter Claim Amount: ");
                         double amount = IOManager.intInputDouble(0.00, 999999.99);
                         String claim_status = "Pending";
-                        success_value = database.insertClaim(claim_id, claim_type, accident, items_damaged, description, decision, adjuster_notes, amount, claim_status, policy_id);            
+                        success_value = customer.insertClaim(claim_id, claim_type, accident, items_damaged, description, decision, adjuster_notes, amount, claim_status, policy_id);            
                         if (success_value == 1) {
                             try{
-                                database.connect.commit();
+                                database.commit();
                                 System.out.println("TRANSACTION SUCCEEDED!\n");
                             }
                             catch (SQLException exception) {
@@ -555,14 +520,14 @@ import insurance.IOManager;
                 else if (menue_selection == 5) {
                     System.out.print("Enter Existing Policy ID to Make a Payment: ");
                     int policy_id = user_integer();
-                    success_value = database.getPolicyID(policy_id);
+                    success_value = customer.getPolicyID(policy_id);
                     if (success_value == policy_id) {
-                        int cost = database.getPolicyCost(policy_id);
+                        int cost = customer.getPolicyCost(policy_id);
                         Date[] dates = new Date[2];
                         Date payment_date_check = currentDate();
                         System.out.println(payment_date_check);
                         System.out.println(dates[0]);
-                        dates = database.getPolicyDate(policy_id);
+                        dates = customer.getPolicyDate(policy_id);
                         LocalDate localdate = LocalDate.now();
                         Calendar calendar = Calendar.getInstance();
                         calendar.setTime(dates[0]);
@@ -586,7 +551,7 @@ import insurance.IOManager;
                                         int expiary_date = IOManager.intInput(2000, 2030, 4);
                                         System.out.print("Enter CVV Number: ");
                                         int cvv = IOManager.intInput(000, 999, 3);
-                                        int success1 = database.payDebitCard(payment_id, type, card_number, cvv, policy_id, expiary_date);
+                                        int success1 = customer.payDebitCard(payment_id, type, card_number, cvv, policy_id, expiary_date);
                                         System.out.print("success value is: " + success1);
                                         System.out.print("Enter Policy Holder's Name: ");
                                         String recipient_name = IOManager.stringInputWithoutNumbers(30);
@@ -612,10 +577,10 @@ import insurance.IOManager;
                                         if (payment_date_check.after(dates[0])) {
                                             System.out.print("Payment Date is After Effective Date! Payment is Marked as Late!\n");
                                         }
-                                        int success2 = database.makePolicyPayment(payment_id, policy_id, recipient_name, recipient_address, bank, cost, status);
+                                        int success2 = customer.makePolicyPayment(payment_id, policy_id, recipient_name, recipient_address, bank, cost, status);
                                         try{
                                             if (success1 + success2 == 2) {
-                                                database.connect.commit();
+                                                database.commit();
                                                 System.out.print("TRANSACTION SUCCEEDED!\n");
                                                 System.out.println("Have A Nice Day!\n");
                                                 System.exit(0);
@@ -637,7 +602,7 @@ import insurance.IOManager;
                                         int expiary_date = IOManager.intInput(2000, 2030, 4);
                                         System.out.print("Enter CVV Number: ");
                                         int cvv = IOManager.intInput(000, 999, 3);
-                                        int success1 = database.payCreditCard(payment_id, type, card_number, cvv, policy_id, expiary_date);
+                                        int success1 = customer.payCreditCard(payment_id, type, card_number, cvv, policy_id, expiary_date);
                                         System.out.print("Enter Policy Holder's Name: ");
                                         String recipient_name = IOManager.stringInputWithoutNumbers(30);
                                         System.out.print("Enter Policy Holders Address: ");
@@ -663,10 +628,10 @@ import insurance.IOManager;
                                             System.out.print("Payment Date is After Effective Date! Payment is Marked as Late!\n");
                                         }
                                         // String status = user_string("status");
-                                        int success2 = database.makePolicyPayment(payment_id, policy_id, recipient_name, recipient_address, bank, cost, status);
+                                        int success2 = customer.makePolicyPayment(payment_id, policy_id, recipient_name, recipient_address, bank, cost, status);
                                         try{
                                             if (success1 + success2 == 2) {
-                                                database.connect.commit();
+                                                database.commit();
                                                 System.out.println("TRANSACTION SUCCEEDED!\n");
                                                 System.exit(0);
                                             }
@@ -696,9 +661,9 @@ import insurance.IOManager;
                 else if (menue_selection == 6) {
                     System.out.print("Enter Existing Policy ID to Retrieve Information About the Policy: \n");
                     int policy_id = user_integer();
-                    success_value = database.getPolicyID(policy_id);
+                    success_value = customer.getPolicyID(policy_id);
                     if (policy_id == success_value) {
-                        success_value = database.getPolicyInfo(policy_id);
+                        success_value = customer.getPolicyInfo(policy_id);
                         System.out.print("\n");
                     }
                     else {
@@ -711,9 +676,9 @@ import insurance.IOManager;
                 else if (menue_selection == 7) {
                     System.out.print("Enter Existing Claim ID to Check the Status of the Claim: ");
                     int claim_id = user_integer();
-                    success_value = database.getClaimID(claim_id);
+                    success_value = customer.getClaimID(claim_id);
                     if (claim_id == success_value) {
-                        database.getClaimStatus(claim_id);
+                        customer.getClaimStatus(claim_id);
                         System.out.print("\n");
                         
                     }
@@ -727,7 +692,7 @@ import insurance.IOManager;
                 else if (menue_selection == 8) {
                     System.out.println("Enter Existing Policy ID to Add a Dependant to the Policy: ");
                     int policy_id = user_integer();
-                    success_value = database.getPolicyID(policy_id);
+                    success_value = customer.getPolicyID(policy_id);
                     if (policy_id == success_value) {
                         int dependant_id = IOManager.idNumber(999999);
                         System.out.print("Enter Dependant Name: ");
@@ -740,11 +705,11 @@ import insurance.IOManager;
                             date_of_birth = input.next();
                             dependant_valid_date = validateDate(date_of_birth);
                         } 
-                        int dep_value = database.insertDependant(dependant_id, policy_id, name, social_security, date_of_birth);
+                        int dep_value = customer.insertDependant(dependant_id, policy_id, name, social_security, date_of_birth);
                         System.out.print("\n");
                         if (dep_value == 1) {
                             try{
-                                database.connect.commit();
+                                database.commit();
                                 System.out.println("TRANSACTION SUCCEEDED!\n");
                             }
                             catch (SQLException exception) {
@@ -766,7 +731,7 @@ import insurance.IOManager;
                     if (menue_selection == 1) {
                         System.out.print("Enter Existing Auto Insurance Policy: ");
                         int policy_id = user_integer();
-                        success_value = database.getPolicyID(policy_id);
+                        success_value = customer.getPolicyID(policy_id);
                         if (policy_id == success_value) {
                             int vehicle_id = IOManager.idNumber(999999);
                             String extra_vehicle = "Yes";
@@ -786,10 +751,10 @@ import insurance.IOManager;
                             int annual_miles = IOManager.intInputRange(0, 99999);
                             System.out.print("Enter Market Value: ");           
                             int market_value = IOManager.intInputRange(1000, 10000000);
-                            int success_values = database.insertAdditionalVehicle(policy_id, vehicle_id, extra_vehicle, year, make, model, vin, license_plate, total_mileage, annual_miles, market_value);
+                            int success_values = customer.insertAdditionalVehicle(policy_id, vehicle_id, extra_vehicle, year, make, model, vin, license_plate, total_mileage, annual_miles, market_value);
                             if (success_values == 1) {
                                 try{
-                                    database.connect.commit();
+                                    database.commit();
                                     System.out.println("TRANSACTION SUCCEEDED!\n");
                                 }
                                 catch (SQLException exception) {
@@ -801,10 +766,10 @@ import insurance.IOManager;
                     else if (menue_selection == 2) {
                         System.out.print("[2] Enter Exising Auto Insuance Policy: ");
                         int vehicle_id = user_integer();
-                        success_value = database.deleteAdditionalVehicle(vehicle_id);
+                        success_value = customer.deleteAdditionalVehicle(vehicle_id);
                         if (success_value == 1) {
                             try{
-                                database.connect.commit();
+                                database.commit();
                                 System.out.println("TRANSACTION SUCCEEDED!\n");
                             }
                             catch (SQLException exception) {
@@ -1337,7 +1302,7 @@ import insurance.IOManager;
     }
 
     /**
-     * getPolicyID checks if policy ID exists in the databases
+     * getPolicyID checks if policy ID exists in the database
      */
     public int getPolicyID(int policy_id) {
         int id = 0;
