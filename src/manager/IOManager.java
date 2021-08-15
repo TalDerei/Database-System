@@ -6,7 +6,7 @@
  * User ID: tad222
  */
 
-package insurance;
+package manager;
 
 import java.util.Scanner;
 import java.util.Random;

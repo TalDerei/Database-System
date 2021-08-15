@@ -6,12 +6,13 @@
  * User ID: tad222
  */
 
-package insurance;
+package interfaces;
 
 import java.util.Scanner;
 import java.sql.Date;
 import java.sql.*;
 import java.text.*;
+import manager.IOManager;
 
 /**
  * Adjuster Interface

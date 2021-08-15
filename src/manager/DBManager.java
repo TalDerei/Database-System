@@ -1,4 +1,12 @@
-package insurance;
+/**
+ * Course: CSE 341
+ * Semester and Year: Spring 2021
+ * Assignment: Database Systems
+ * Author: Derei, Tal
+ * User ID: tad222
+ */
+
+package manager;
 
 import java.sql.*;
 import java.util.*;
@@ -18,18 +26,7 @@ public class DBManager {
         String username = "ezdvczoxegzrgf";
         String password = "e620a6a42fb3d6b0dd4d628325d441386eb62ccd53eee2439aa7b86c9caa91ed";
 
-        // USER'S USERNAME AND PASSWORD:
-        // try {
-        //     System.out.print("Enter PostgreSQL username: ");   
-        //     username = input.nextLine();
-        //     System.out.print("Enter PostgreSQL password for " + username + ": ");
-        //     password = input.nextLine();    
-        // }
-        // catch (InputMismatchException inputMismatchException) {
-        //     System.out.println("Wrong credentials! Try Again!");
-        //     return connect();
-        // }
-
+        /* try connecting to database with user-credentials */
         try {
             conn = DriverManager.getConnection(url, username, password);
             conn.setAutoCommit(false);

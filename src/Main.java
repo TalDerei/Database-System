@@ -8,11 +8,11 @@
 
 import java.sql.Connection;
 import java.util.Scanner;
-import insurance.Customer_Interface;
-import insurance.Adjuster_Interface;
-import insurance.Agent_Interface;
-import insurance.Corporate_Interface;
-import insurance.DBManager;
+import interfaces.Customer_Interface;
+import interfaces.Adjuster_Interface;
+import interfaces.Agent_Interface;
+import interfaces.Corporate_Interface;
+import manager.DBManager;
 
 /**
  * User-interface for insurance database
@@ -62,3 +62,8 @@ public class Main {
     }
 }
 
+// split up functions and classes into respective folders/packages
+// look into prepared statemnt caching vs seperating them
+// seperate the functions from CLI
+// create seperate objects 
+// create interface boilerplate

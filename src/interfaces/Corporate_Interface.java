@@ -6,7 +6,7 @@
  * User ID: tad222
  */
 
-package insurance;
+package interfaces;
 
 /**
  * Corporate Interface
