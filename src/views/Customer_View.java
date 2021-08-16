@@ -36,7 +36,7 @@ public class Customer_View {
     /**
      * Cached Prepared Statements for agent interfaces
      */
-    public static void prepareStatements(Connection conn) {
+    public void prepare(Connection conn) {
         try {
             Customer_View.createCustomer = conn.prepareStatement("INSERT INTO customer (CUSTOMER_ID, NAME, SOCIAL_SECURITY, EMAIL, ZIP_CODE, CITY, STATE, ADDRESS, DATE_OF_BIRTH, PHONE_NUMBER) VALUES (?,?,?,?,?,?,?,?,?,?)");
             Customer_View.dropPolicy = conn.prepareStatement("DELETE FROM policy WHERE policy_id = ?");
@@ -68,7 +68,7 @@ public class Customer_View {
     /**
      * insertCustomer inserts new customer
      */
-    public static int insertCustomer(int customer_id, String name, int social_security, String email, int zip_code, String city, String state, String address, String phone_number, String date_of_birth) {
+    public int insertCustomer(int customer_id, String name, int social_security, String email, int zip_code, String city, String state, String address, String phone_number, String date_of_birth) {
         int success = 0;
         try {
             createCustomer.setInt(1, customer_id);
@@ -93,7 +93,7 @@ public class Customer_View {
     /**
      * deletePolicy deletes existing policy
      */
-    public static int deletePolicy(int policy_id) {
+    public int deletePolicy(int policy_id) {
         int success = 0;
         try {
             dropPolicy.setInt(1, policy_id);
@@ -108,7 +108,7 @@ public class Customer_View {
     /**
      * insertClaim inserts claim associated with a policy
      */
-    public static int insertClaim(int claim_id, String claim_type, String accident, String items_damaged, String description, String outcome, String adjuster_notes, double amount, String claim_status, int policy_id) {
+    public int insertClaim(int claim_id, String claim_type, String accident, String items_damaged, String description, String outcome, String adjuster_notes, double amount, String claim_status, int policy_id) {
         int success = 0;
         try {
             addClaim.setInt(1, claim_id);
@@ -133,7 +133,7 @@ public class Customer_View {
     /**
      * user_integer provides input checking for integers
      */
-    public static int user_integer() {
+    public int user_integer() {
         Scanner input = new Scanner(System.in);
             boolean conditional = true;
             while (conditional) {
@@ -155,7 +155,7 @@ public class Customer_View {
      /**
      * user_string provides input checking for strings
      */
-    public static String user_string() {
+    public String user_string() {
         Scanner input = new Scanner(System.in);
             boolean conditional = true;
             while (conditional) {
@@ -177,7 +177,7 @@ public class Customer_View {
     /**
      * validateDate check's the format of date data types
      */
-    public static Boolean validateDate(String date_of_birth) {
+    public Boolean validateDate(String date_of_birth) {
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         try {
             format.parse(date_of_birth);
@@ -191,7 +191,7 @@ public class Customer_View {
     /**
      * currentDate retrieves the current date based on internal system clock 
      */
-    public static java.sql.Date currentDate() {
+    public java.sql.Date currentDate() {
         java.util.Date current = new java.util.Date();
         return new java.sql.Date(current.getTime());
     }
@@ -199,7 +199,7 @@ public class Customer_View {
     /**
      * getCustomerID checks if customer ID is in the database when user attempts to add a policy
      */
-    public static int getCustomerID(int customer_id) {
+    public int getCustomerID(int customer_id) {
         int id = 0;
         try {
             checkCustomerID.setInt(1, customer_id);
@@ -224,7 +224,7 @@ public class Customer_View {
     /**
      * insertGenericPolicy inserts a top-level policy in the policy table
      */
-    public static int insertGenericPolicy(int customer_id, int policy_id, String type, double cost, double coverage, double deductible, int coinsurance, String effective_date, String expire_date, String plan, String policy_status) {
+    public int insertGenericPolicy(int customer_id, int policy_id, String type, double cost, double coverage, double deductible, int coinsurance, String effective_date, String expire_date, String plan, String policy_status) {
         int success = 0;
         try {
             addPolicy.setInt(1, customer_id);
@@ -249,7 +249,7 @@ public class Customer_View {
     /**
      * insertHomeInsurance creates home insurance policy
      */
-    public static int insertHomeInsurance(int policy_id, String city, String state, int zip_code, String address, int year_built, String condition, double square_foot, double lot_size, int credit_score, double mortgage_payment, double market_value, String personal_property_replacement, String plan_category) {
+    public int insertHomeInsurance(int policy_id, String city, String state, int zip_code, String address, int year_built, String condition, double square_foot, double lot_size, int credit_score, double mortgage_payment, double market_value, String personal_property_replacement, String plan_category) {
         int success = 0;
         try {
             addHomeInsurance.setInt(1, policy_id);
@@ -277,7 +277,7 @@ public class Customer_View {
      /**
      * insertAutoInsurance creates auto insurance policy
      */
-    public static int insertAutoInsurance(int policy_id, int year, String make, String model, String vin, String license_plate, String driver_license, int total_mileage, int annual_miles, int market_value, String age, String gender, int credit_score, String traffic_violations, int number_of_dependants, String state, String plan_category) {
+    public int insertAutoInsurance(int policy_id, int year, String make, String model, String vin, String license_plate, String driver_license, int total_mileage, int annual_miles, int market_value, String age, String gender, int credit_score, String traffic_violations, int number_of_dependants, String state, String plan_category) {
         int success = 0;
         try {
             addAutoInsurance.setInt(1, policy_id);
@@ -308,7 +308,7 @@ public class Customer_View {
      /**
      * insertHealthInsurance creates health insurance policy
      */
-    public static int insertHealthInsurance(int policy_id, String plan_category, double out_of_pocket_maximum, String tobacco_use, String age, String pre_existing_conditions, int number_of_dependants, double estimated_copay) {
+    public int insertHealthInsurance(int policy_id, String plan_category, double out_of_pocket_maximum, String tobacco_use, String age, String pre_existing_conditions, int number_of_dependants, double estimated_copay) {
         int success = 0;
         try {
             addHealthInsurance.setInt(1, policy_id);
@@ -330,7 +330,7 @@ public class Customer_View {
      /**
      * insertLifeInsurance creates life insurance policy
      */
-    public static int insertLifeInsurance(int policy_id, String plan_category, String age, String gender, String tobacco_use, String occupation, String medical_status, String family_medical_history, String beneficiary_name, int beneficiary_social_security) {
+    public int insertLifeInsurance(int policy_id, String plan_category, String age, String gender, String tobacco_use, String occupation, String medical_status, String family_medical_history, String beneficiary_name, int beneficiary_social_security) {
         int success = 0;
         try {
             addLifeInsurance.setInt(1, policy_id);
@@ -354,7 +354,7 @@ public class Customer_View {
     /**
      * getCustomerId checks if customer ID exists in the database
      */
-    public static int getCustomerId(int customer_id) {
+    public int getCustomerId(int customer_id) {
         int success = 0;
         try {
             checkCustomerID.setInt(1, customer_id);
@@ -378,7 +378,7 @@ public class Customer_View {
     /**
      * getPolicyCost checks policy cost associated with a customer's policy
      */
-    public static int getPolicyCost(int policy_id) {
+    public int getPolicyCost(int policy_id) {
         int cost = 0;
         try {
             checkPolicyCost.setInt(1, policy_id);
@@ -403,7 +403,7 @@ public class Customer_View {
     /**
      * getPolicyDate checks date associated with customer policy to determine policy payment is on time or overdue
      */
-    public static Date[] getPolicyDate(int policy_id) {
+    public Date[] getPolicyDate(int policy_id) {
         Date[] dates = new Date[2];
         Date effective_date;
         Date expire_date;
@@ -434,7 +434,7 @@ public class Customer_View {
     /**
      * makePolicyPayment allows user to make policy payment
      */
-    public static int makePolicyPayment(int payment_id, int policy_id, String recipient_name, String recipient_address, String bank, int payment_amount, String status) {
+    public int makePolicyPayment(int payment_id, int policy_id, String recipient_name, String recipient_address, String bank, int payment_amount, String status) {
         int success = 0;
         try {
             policyPayment.setInt(1, payment_id);
@@ -456,7 +456,7 @@ public class Customer_View {
     /**
      * payDebitCard makes a debit payment to policy
      */
-    public static int payDebitCard(int payment_id, String type, long card_number, int cvv, int policy_id, int expiary_date) {
+    public int payDebitCard(int payment_id, String type, long card_number, int cvv, int policy_id, int expiary_date) {
         int success = 0;
         try {
             addDebitCard.setInt(1, payment_id);
@@ -476,7 +476,7 @@ public class Customer_View {
      /**
      * payCreditCard makes a credit payment to policy
      */
-    public static int payCreditCard(int payment_id, String type, long card_number, int cvv, int policy_id, int expiary_date) {
+    public int payCreditCard(int payment_id, String type, long card_number, int cvv, int policy_id, int expiary_date) {
         int success = 0;
         try {
             addCreditCard.setInt(1, payment_id);
@@ -496,7 +496,7 @@ public class Customer_View {
     /**
      * getPolicyInfo returns all information about a customer's existing policy 
      */
-    public static int getPolicyInfo(int policy_id) {
+    public int getPolicyInfo(int policy_id) {
         int success = 0;
         try {
             getPolicyInformation.setInt(1, policy_id);
@@ -534,7 +534,7 @@ public class Customer_View {
     /**
      * checkClaimID checks if claim ID exists in the database 
      */
-    public static int getClaimID(int claim_id) {
+    public int getClaimID(int claim_id) {
         int id = 0;
         try {
             checkClaimID.setInt(1, claim_id);
@@ -553,7 +553,7 @@ public class Customer_View {
     /**
      * getClaimStatus checks customer's claim status
      */
-    public static String getClaimStatus(int claim_id) {
+    public String getClaimStatus(int claim_id) {
         String decision = "";
         try {
             checkClaimStatus.setInt(1, claim_id);
@@ -573,7 +573,7 @@ public class Customer_View {
     /**
      * getPolicyID checks if policy ID exists in the database
      */
-    public static int getPolicyID(int policy_id) {
+    public int getPolicyID(int policy_id) {
         int id = 0;
         try {
             checkPolicyID.setInt(1, policy_id);
@@ -592,7 +592,7 @@ public class Customer_View {
     /**
      * insertDependant inserts new dependant associated with a customer policy
      */
-    public static int insertDependant(int dependant_id, int policy_id, String name, int social_security, String date_of_birth) {
+    public int insertDependant(int dependant_id, int policy_id, String name, int social_security, String date_of_birth) {
         int success = 0;
         try {
             addDependant.setInt(1, dependant_id);
@@ -611,7 +611,7 @@ public class Customer_View {
     /**
      * insertAdditionalVehicle inserts additional vehicles into existing auto insurance policy 
      */
-    public static int insertAdditionalVehicle(int policy_id, int vehicle_id, String extra_vehicle, int year, String make, String model, String vin, String license_plate, int total_mileage, int annual_miles, int market_value) {
+    public int insertAdditionalVehicle(int policy_id, int vehicle_id, String extra_vehicle, int year, String make, String model, String vin, String license_plate, int total_mileage, int annual_miles, int market_value) {
         int success = 0;
         try {
             addAdditionalVehicle.setInt(1, policy_id);
@@ -637,7 +637,7 @@ public class Customer_View {
     /**
      * deleteAdditionalVehicle deletes additional vehicles from existing auto insurance policy 
      */
-    public static int deleteAdditionalVehicle(int vehicle_id) {
+    public int deleteAdditionalVehicle(int vehicle_id) {
         int success = 0;
         try {
             dropPolicy.setInt(1, vehicle_id);
@@ -653,7 +653,7 @@ public class Customer_View {
     /**
      * checkPaymentStatus checks the status of a payment
      */
-    public static String checkPaymentStatus(Calendar calendar, LocalDate localdate) {
+    public String checkPaymentStatus(Calendar calendar, LocalDate localdate) {
         String status = "";
         System.out.println("policy day is: " + calendar.get(Calendar.DAY_OF_MONTH));
         System.out.println("policy year is: " + calendar.get(Calendar.YEAR));

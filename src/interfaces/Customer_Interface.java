@@ -24,7 +24,8 @@ public class Customer_Interface {
      * @param connection Connection object
      */
     public static void Customer(Connection connection) {
-        Customer_View.prepareStatements(connection);
+        Customer_View customer_view = new Customer_View();
+        customer_view.prepare(connection);
 
         /**
          * Command-line interface for customer interface
@@ -67,7 +68,7 @@ public class Customer_Interface {
                     System.out.print("Enter Birth Date ([yy]yy-mm-dd): ");
                     while (valid_start_date) {
                         date_of_birth = input.next();
-                        valid_start_date = Customer_View.validateDate(date_of_birth);
+                        valid_start_date = customer_view.validateDate(date_of_birth);
                     } 
                     System.out.print("Enter Email Address: ");
                     String email = IOManager.validEmail();
@@ -81,7 +82,7 @@ public class Customer_Interface {
                     String address = IOManager.stringInput(50);
                     System.out.print("Enter Phone Number: ");
                     String phone_number = IOManager.validPhoneNumber(10);
-                    success_value = Customer_View.insertCustomer(customer_id, name, social_security, email, zip_code, city, state, address, phone_number, date_of_birth);
+                    success_value = customer_view.insertCustomer(customer_id, name, social_security, email, zip_code, city, state, address, phone_number, date_of_birth);
                     if (success_value == 1) {
                         try{
                             connection.commit();
@@ -100,8 +101,8 @@ public class Customer_Interface {
                  */
                 else if (menue_selection == 2) {
                     System.out.print("Please Enter an Existing 6-digit Customer ID to Create a New Policy: ");
-                    int customer_id = Customer_View.user_integer();
-                    success_value = Customer_View.getCustomerID(customer_id);
+                    int customer_id = customer_view.user_integer();
+                    success_value = customer_view.getCustomerID(customer_id);
                     if (customer_id == success_value) {
                         while (true) {
                             System.out.println("Select an Insurance Policy From The List Below: \n");
@@ -130,16 +131,16 @@ public class Customer_Interface {
                                         System.out.println("Enter Policy Effective Date: ");
                                         while (valid_start_date) {
                                             effective_date = input.next();
-                                            valid_start_date = Customer_View.validateDate(effective_date);
+                                            valid_start_date = customer_view.validateDate(effective_date);
                                         } 
                                         System.out.println("Enter Policy Expiration Date: ");
                                         while (valid_end_date) {
                                             expire_date = input.next();
-                                            valid_end_date = Customer_View.validateDate(expire_date);
+                                            valid_end_date = customer_view.validateDate(expire_date);
                                         } 
                                         String plan = IOManager.policyPlan(menue_selection);
                                         String policy_status = "Pending";
-                                        int success1 = Customer_View.insertGenericPolicy(customer_id, policy_id, type, cost, coverage, deductible, coinsurance, effective_date, expire_date, plan, policy_status);
+                                        int success1 = customer_view.insertGenericPolicy(customer_id, policy_id, type, cost, coverage, deductible, coinsurance, effective_date, expire_date, plan, policy_status);
                                         System.out.print("\n");
 
                                         System.out.println("Home Insurance");
@@ -170,7 +171,7 @@ public class Customer_Interface {
                                         String personal_property_replacement = IOManager.yesOrNo();
                                         System.out.println("Enter plan category: [1] Home, [2] Apartment, [3] Condo, [4] Townhouse, [5] Flat, [6] Mobile Home");
                                         String plan_category = IOManager.planCategoryHomeInsurance(1);
-                                        int success2 = Customer_View.insertHomeInsurance(policy_id, city, state, zip_code, address, year_built, condition, square_foot, lot_size, credit_score, mortgage_payment, market_value, personal_property_replacement, plan_category);
+                                        int success2 = customer_view.insertHomeInsurance(policy_id, city, state, zip_code, address, year_built, condition, square_foot, lot_size, credit_score, mortgage_payment, market_value, personal_property_replacement, plan_category);
                                         try{
                                             if (success1 + success2 == 2) {
                                                 connection.commit();
@@ -199,16 +200,16 @@ public class Customer_Interface {
                                     System.out.println("Enter Policy Effective Date: ");
                                     while (valid_start_date) {
                                         effective_date = input.next();
-                                        valid_start_date = Customer_View.validateDate(effective_date);
+                                        valid_start_date = customer_view.validateDate(effective_date);
                                     } 
                                     System.out.println("Enter Policy Expiration Date: ");
                                     while (valid_end_date) {
                                         expire_date = input.next();
-                                        valid_end_date = Customer_View.validateDate(expire_date);
+                                        valid_end_date = customer_view.validateDate(expire_date);
                                     } 
                                     String plan = IOManager.policyPlan(menue_selection);
                                     String policy_status = "Pending";
-                                    int success3 = Customer_View.insertGenericPolicy(customer_id, policy_id, type, cost, coverage, deductible, coinsurance, effective_date, expire_date, plan, policy_status);
+                                    int success3 = customer_view.insertGenericPolicy(customer_id, policy_id, type, cost, coverage, deductible, coinsurance, effective_date, expire_date, plan, policy_status);
                                     System.out.print("\n");
 
                                     System.out.print("Enter Year Built: ");
@@ -233,7 +234,7 @@ public class Customer_Interface {
                                     boolean valid_auto_date = true;
                                     while (valid_auto_date) {
                                         date_of_birth = input.next();
-                                        valid_auto_date = Customer_View.validateDate(date_of_birth);
+                                        valid_auto_date = customer_view.validateDate(date_of_birth);
                                     } 
                                     System.out.print("Enter Gender (Enter [M]ale or [F]emale): ");
                                     String gender = IOManager.gender();
@@ -247,7 +248,7 @@ public class Customer_Interface {
                                     String state = IOManager.stringInputWithoutNumbers(20); 
                                     System.out.print("Enter Policy Category [1] Collision, [2] Motorist, [3] Liability, [4] Comprehensive, [5] Personal Injury: ");
                                     String plan_category = IOManager.planCategoryAutoInsurance(1);
-                                    int success4 = Customer_View.insertAutoInsurance(policy_id, year, make, model, vin, license_plate, driver_license, total_mileage, annual_miles, market_value, date_of_birth, gender, credit_score, traffic_violations, number_of_dependants, state, plan_category);
+                                    int success4 = customer_view.insertAutoInsurance(policy_id, year, make, model, vin, license_plate, driver_license, total_mileage, annual_miles, market_value, date_of_birth, gender, credit_score, traffic_violations, number_of_dependants, state, plan_category);
                                     try{
                                         if (success3 + success4 == 2) {
                                             connection.commit();
@@ -276,16 +277,16 @@ public class Customer_Interface {
                                     System.out.println("Enter Policy Effective Date: ");
                                     while (valid_start_date) {
                                         effective_date = input.next();
-                                        valid_start_date = Customer_View.validateDate(effective_date);
+                                        valid_start_date = customer_view.validateDate(effective_date);
                                     } 
                                     System.out.print("Enter Policy Expiration Date: ");
                                     while (valid_end_date) {
                                         expire_date = input.next();
-                                        valid_end_date = Customer_View.validateDate(expire_date);
+                                        valid_end_date = customer_view.validateDate(expire_date);
                                     } 
                                     String plan = IOManager.policyPlan(menue_selection);
                                     String policy_status = "Pending";
-                                    int success5 = Customer_View.insertGenericPolicy(customer_id, policy_id, type, cost, coverage, deductible, coinsurance, effective_date, expire_date, plan, policy_status);
+                                    int success5 = customer_view.insertGenericPolicy(customer_id, policy_id, type, cost, coverage, deductible, coinsurance, effective_date, expire_date, plan, policy_status);
                                     System.out.print("\n");
                                     
                                     System.out.print("Enter Policy Category [1] Collision, [2] Motorist, [3] Liability, [4] Comprehensive, [5] Personal Injury: ");
@@ -299,7 +300,7 @@ public class Customer_Interface {
                                     boolean valid_health_date = true;
                                     while (valid_health_date) {
                                         age = input.next();
-                                        valid_health_date = Customer_View.validateDate(age);
+                                        valid_health_date = customer_view.validateDate(age);
                                     } 
                                     System.out.println("Enter Pre-Existing Conditions ([Y]es or [N]o): ");
                                     String pre_existing_conditions = IOManager.yesOrNo();
@@ -307,7 +308,7 @@ public class Customer_Interface {
                                     int number_of_dependants = IOManager.intInput(0, 9, 1);
                                     System.out.println("Enter Estimated Copay: ");
                                     double estimated_copay = IOManager.intInputDouble(0.00, 9999.99);
-                                    int success6 = Customer_View.insertHealthInsurance(policy_id, plan_category, out_of_pocket_maximum, tobacco_use, age, pre_existing_conditions, number_of_dependants, estimated_copay);
+                                    int success6 = customer_view.insertHealthInsurance(policy_id, plan_category, out_of_pocket_maximum, tobacco_use, age, pre_existing_conditions, number_of_dependants, estimated_copay);
                                     try{
                                         if (success5 + success6 == 2) {
                                             connection.commit();
@@ -338,16 +339,16 @@ public class Customer_Interface {
                                     System.out.println("Enter Policy Effective Date: ");
                                     while (valid_start_date) {
                                         effective_date = input.next();
-                                        valid_start_date = Customer_View.validateDate(effective_date);
+                                        valid_start_date = customer_view.validateDate(effective_date);
                                     } 
                                     System.out.println("Enter Policy Expiration Date: ");
                                     while (valid_end_date) {
                                         expire_date = input.next();
-                                        valid_end_date = Customer_View.validateDate(expire_date);
+                                        valid_end_date = customer_view.validateDate(expire_date);
                                     } 
                                     String plan = IOManager.policyPlan(menue_selection);
                                     String policy_status = "Pending";
-                                    int success7 = Customer_View.insertGenericPolicy(customer_id, policy_id, type, cost, coverage, deductible, coinsurance, effective_date, expire_date, plan, policy_status);
+                                    int success7 = customer_view.insertGenericPolicy(customer_id, policy_id, type, cost, coverage, deductible, coinsurance, effective_date, expire_date, plan, policy_status);
                                     System.out.print("\n");
 
                                     System.out.print("Enter Policy Category: [1] Whole Life, [2] Universal Life, [3] Term Life");
@@ -357,7 +358,7 @@ public class Customer_Interface {
                                     boolean valid_life_date = true;
                                     while (valid_life_date) {
                                         age = input.next();
-                                        valid_life_date = Customer_View.validateDate(age);
+                                        valid_life_date = customer_view.validateDate(age);
                                     } 
                                     System.out.print("Enter Gender ([M]ale or [F]emale): ");
                                     String gender = IOManager.gender();
@@ -373,7 +374,7 @@ public class Customer_Interface {
                                     String beneficiary_name = IOManager.stringInputWithoutNumbers(30);
                                     System.out.print("Enter Primary Benefiary Social Security: ");
                                     int beneficiary_social_security = IOManager.intInput(100000000, 999999999, 9);
-                                    int success8 = Customer_View.insertLifeInsurance(policy_id, plan_category, age, gender, tobacco_use, occupation, medical_status, family_medical_history, beneficiary_name, beneficiary_social_security);
+                                    int success8 = customer_view.insertLifeInsurance(policy_id, plan_category, age, gender, tobacco_use, occupation, medical_status, family_medical_history, beneficiary_name, beneficiary_social_security);
                                     
                                     try{
                                         if (success7 + success8 == 2) {
@@ -407,10 +408,10 @@ public class Customer_Interface {
                  */
                 else if (menue_selection == 3) {
                     System.out.print("Enter an existing policy ID to drop the policy: ");
-                    int policy_id = Customer_View.user_integer();
-                    success_value = Customer_View.getPolicyID(policy_id);
+                    int policy_id = customer_view.user_integer();
+                    success_value = customer_view.getPolicyID(policy_id);
                     if (policy_id == success_value) {
-                        success_value = Customer_View.deletePolicy(policy_id);
+                        success_value = customer_view.deletePolicy(policy_id);
                         System.out.println("Successfully Deleted Policy!\n");
                     }
                     else {
@@ -422,8 +423,8 @@ public class Customer_Interface {
                  */
                 else if (menue_selection == 4) {
                     System.out.print("Enter an Existing Policy ID to Start a Claim: ");
-                    int policy_id = Customer_View.user_integer();
-                    success_value = Customer_View.getPolicyID(policy_id);
+                    int policy_id = customer_view.user_integer();
+                    success_value = customer_view.getPolicyID(policy_id);
                     if (policy_id == success_value) {
                         int claim_id = IOManager.idNumber(999999);
                         String claim_type = IOManager.policyPlan(1);
@@ -439,7 +440,7 @@ public class Customer_Interface {
                         System.out.print("Enter Claim Amount: ");
                         double amount = IOManager.intInputDouble(0.00, 999999.99);
                         String claim_status = "Pending";
-                        success_value = Customer_View.insertClaim(claim_id, claim_type, accident, items_damaged, description, decision, adjuster_notes, amount, claim_status, policy_id);            
+                        success_value = customer_view.insertClaim(claim_id, claim_type, accident, items_damaged, description, decision, adjuster_notes, amount, claim_status, policy_id);            
                         if (success_value == 1) {
                             try{
                                 connection.commit();
@@ -462,19 +463,19 @@ public class Customer_Interface {
                  */
                 else if (menue_selection == 5) {
                     System.out.print("Enter Existing Policy ID to Make a Payment: ");
-                    int policy_id = Customer_View.user_integer();
-                    success_value = Customer_View.getPolicyID(policy_id);
+                    int policy_id = customer_view.user_integer();
+                    success_value = customer_view.getPolicyID(policy_id);
                     if (success_value == policy_id) {
-                        int cost = Customer_View.getPolicyCost(policy_id);
+                        int cost = customer_view.getPolicyCost(policy_id);
                         Date[] dates = new Date[2];
-                        Date payment_date_check = Customer_View.currentDate();
+                        Date payment_date_check = customer_view.currentDate();
                         System.out.println(payment_date_check);
                         System.out.println(dates[0]);
-                        dates = Customer_View.getPolicyDate(policy_id);
+                        dates = customer_view.getPolicyDate(policy_id);
                         LocalDate localdate = LocalDate.now();
                         Calendar calendar = Calendar.getInstance();
                         calendar.setTime(dates[0]);
-                        String status = Customer_View.checkPaymentStatus(calendar, localdate);
+                        String status = customer_view.checkPaymentStatus(calendar, localdate);
                         System.out.println("Status is: " + status);
                         if (cost != 0) {
                             System.out.println("How Would You Like To Pay? \n");
@@ -494,7 +495,7 @@ public class Customer_Interface {
                                         int expiary_date = IOManager.intInput(2000, 2030, 4);
                                         System.out.print("Enter CVV Number: ");
                                         int cvv = IOManager.intInput(000, 999, 3);
-                                        int success1 = Customer_View.payDebitCard(payment_id, type, card_number, cvv, policy_id, expiary_date);
+                                        int success1 = customer_view.payDebitCard(payment_id, type, card_number, cvv, policy_id, expiary_date);
                                         System.out.print("success value is: " + success1);
                                         System.out.print("Enter Policy Holder's Name: ");
                                         String recipient_name = IOManager.stringInputWithoutNumbers(30);
@@ -520,7 +521,7 @@ public class Customer_Interface {
                                         if (payment_date_check.after(dates[0])) {
                                             System.out.print("Payment Date is After Effective Date! Payment is Marked as Late!\n");
                                         }
-                                        int success2 = Customer_View.makePolicyPayment(payment_id, policy_id, recipient_name, recipient_address, bank, cost, status);
+                                        int success2 = customer_view.makePolicyPayment(payment_id, policy_id, recipient_name, recipient_address, bank, cost, status);
                                         try{
                                             if (success1 + success2 == 2) {
                                                 connection.commit();
@@ -545,7 +546,7 @@ public class Customer_Interface {
                                         int expiary_date = IOManager.intInput(2000, 2030, 4);
                                         System.out.print("Enter CVV Number: ");
                                         int cvv = IOManager.intInput(000, 999, 3);
-                                        int success1 = Customer_View.payCreditCard(payment_id, type, card_number, cvv, policy_id, expiary_date);
+                                        int success1 = customer_view.payCreditCard(payment_id, type, card_number, cvv, policy_id, expiary_date);
                                         System.out.print("Enter Policy Holder's Name: ");
                                         String recipient_name = IOManager.stringInputWithoutNumbers(30);
                                         System.out.print("Enter Policy Holders Address: ");
@@ -571,7 +572,7 @@ public class Customer_Interface {
                                             System.out.print("Payment Date is After Effective Date! Payment is Marked as Late!\n");
                                         }
                                         // String status = user_string("status");
-                                        int success2 = Customer_View.makePolicyPayment(payment_id, policy_id, recipient_name, recipient_address, bank, cost, status);
+                                        int success2 = customer_view.makePolicyPayment(payment_id, policy_id, recipient_name, recipient_address, bank, cost, status);
                                         try{
                                             if (success1 + success2 == 2) {
                                                 connection.commit();
@@ -603,10 +604,10 @@ public class Customer_Interface {
                  */
                 else if (menue_selection == 6) {
                     System.out.print("Enter Existing Policy ID to Retrieve Information About the Policy: \n");
-                    int policy_id = Customer_View.user_integer();
-                    success_value = Customer_View.getPolicyID(policy_id);
+                    int policy_id = customer_view.user_integer();
+                    success_value = customer_view.getPolicyID(policy_id);
                     if (policy_id == success_value) {
-                        success_value = Customer_View.getPolicyInfo(policy_id);
+                        success_value = customer_view.getPolicyInfo(policy_id);
                         System.out.print("\n");
                     }
                     else {
@@ -618,10 +619,10 @@ public class Customer_Interface {
                  */
                 else if (menue_selection == 7) {
                     System.out.print("Enter Existing Claim ID to Check the Status of the Claim: ");
-                    int claim_id = Customer_View.user_integer();
-                    success_value = Customer_View.getClaimID(claim_id);
+                    int claim_id = customer_view.user_integer();
+                    success_value = customer_view.getClaimID(claim_id);
                     if (claim_id == success_value) {
-                        Customer_View.getClaimStatus(claim_id);
+                        customer_view.getClaimStatus(claim_id);
                         System.out.print("\n");
                         
                     }
@@ -634,8 +635,8 @@ public class Customer_Interface {
                  */
                 else if (menue_selection == 8) {
                     System.out.println("Enter Existing Policy ID to Add a Dependant to the Policy: ");
-                    int policy_id = Customer_View.user_integer();
-                    success_value = Customer_View.getPolicyID(policy_id);
+                    int policy_id = customer_view.user_integer();
+                    success_value = customer_view.getPolicyID(policy_id);
                     if (policy_id == success_value) {
                         int dependant_id = IOManager.idNumber(999999);
                         System.out.print("Enter Dependant Name: ");
@@ -646,9 +647,9 @@ public class Customer_Interface {
                         boolean dependant_valid_date = true;
                         while (dependant_valid_date) {
                             date_of_birth = input.next();
-                            dependant_valid_date = Customer_View.validateDate(date_of_birth);
+                            dependant_valid_date = customer_view.validateDate(date_of_birth);
                         } 
-                        int dep_value = Customer_View.insertDependant(dependant_id, policy_id, name, social_security, date_of_birth);
+                        int dep_value = customer_view.insertDependant(dependant_id, policy_id, name, social_security, date_of_birth);
                         System.out.print("\n");
                         if (dep_value == 1) {
                             try{
@@ -670,11 +671,11 @@ public class Customer_Interface {
                 else if (menue_selection == 9) {
                     System.out.println("[1] Add Additional Vehicle to Auto Insurance Policy");
                     System.out.println("[2] Delete Vehicle From Policy");
-                    menue_selection = Customer_View.user_integer();
+                    menue_selection = customer_view.user_integer();
                     if (menue_selection == 1) {
                         System.out.print("Enter Existing Auto Insurance Policy: ");
-                        int policy_id = Customer_View.user_integer();
-                        success_value = Customer_View.getPolicyID(policy_id);
+                        int policy_id = customer_view.user_integer();
+                        success_value = customer_view.getPolicyID(policy_id);
                         if (policy_id == success_value) {
                             int vehicle_id = IOManager.idNumber(999999);
                             String extra_vehicle = "Yes";
@@ -694,7 +695,7 @@ public class Customer_Interface {
                             int annual_miles = IOManager.intInputRange(0, 99999);
                             System.out.print("Enter Market Value: ");           
                             int market_value = IOManager.intInputRange(1000, 10000000);
-                            int success_values = Customer_View.insertAdditionalVehicle(policy_id, vehicle_id, extra_vehicle, year, make, model, vin, license_plate, total_mileage, annual_miles, market_value);
+                            int success_values = customer_view.insertAdditionalVehicle(policy_id, vehicle_id, extra_vehicle, year, make, model, vin, license_plate, total_mileage, annual_miles, market_value);
                             if (success_values == 1) {
                                 try{
                                     connection.commit();
@@ -708,8 +709,8 @@ public class Customer_Interface {
                     }
                     else if (menue_selection == 2) {
                         System.out.print("[2] Enter Exising Auto Insuance Policy: ");
-                        int vehicle_id = Customer_View.user_integer();
-                        success_value = Customer_View.deleteAdditionalVehicle(vehicle_id);
+                        int vehicle_id = customer_view.user_integer();
+                        success_value = customer_view.deleteAdditionalVehicle(vehicle_id);
                         if (success_value == 1) {
                             try{
                                 connection.commit();
