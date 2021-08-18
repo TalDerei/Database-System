@@ -34,7 +34,7 @@ public class Customer_View {
     public static PreparedStatement dropAdditionalVehicle;
 
     /**
-     * Cached Prepared Statements for agent interfaces
+     * Cached Prepared Statements for customer interfaces
      */
     public void prepare(Connection conn) {
         try {

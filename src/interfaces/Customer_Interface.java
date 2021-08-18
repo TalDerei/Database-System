@@ -13,6 +13,7 @@ import java.util.Scanner;
 import java.time.LocalDate;
 import java.util.Calendar;
 import manager.IOManager;
+import objects.Profile;
 import views.Customer_View;
 
 /**
@@ -32,7 +33,7 @@ public class Customer_Interface {
          */
         Scanner input = new Scanner(System.in);
         int menue_selection;
-        int success_value; 
+        int success_value = 0;
         boolean valid_start_date = true;
         boolean valid_end_date = true;
         String date_of_birth = "";
@@ -60,29 +61,31 @@ public class Customer_Interface {
                  * [1] Create a New Customer Profile
                  */
                 if (menue_selection == 1) {
-                    int customer_id = IOManager.idNumber(999999);
+                    Profile profile = new Profile();
+                    profile.setCustomerId(IOManager.idNumber(999999));
                     System.out.print("Enter Customer Name: ");
-                    String name = IOManager.stringInputWithoutNumbers(30);
+                    profile.setName(IOManager.stringInputWithoutNumbers(30));
                     System.out.print("Enter Social Security: ");
-                    int social_security = IOManager.intInput(100000000, 999999999, 9);
+                    profile.setSocialSecurity(IOManager.intInput(100000000, 999999999, 9));
                     System.out.print("Enter Birth Date ([yy]yy-mm-dd): ");
                     while (valid_start_date) {
-                        date_of_birth = input.next();
-                        valid_start_date = customer_view.validateDate(date_of_birth);
+                        profile.setDateOfBirth(input.next());
+                        valid_start_date = customer_view.validateDate(profile.getDateOfBirth());
                     } 
                     System.out.print("Enter Email Address: ");
-                    String email = IOManager.validEmail();
+                    profile.setEmail(IOManager.validEmail());
                     System.out.print("Enter Zip Code: ");
-                    int zip_code = IOManager.intInput(00000, 99999, 5);
+                    profile.setZipCode(IOManager.intInput(00000, 99999, 5));
                     System.out.print("Enter City: ");
-                    String city = IOManager.stringInputWithoutNumbers(20);
+                    profile.setCity(IOManager.stringInputWithoutNumbers(20));
                     System.out.print("Enter State: ");
-                    String state = IOManager.stringInputWithoutNumbers(20);
+                    profile.setState( IOManager.stringInputWithoutNumbers(20));
                     System.out.print("Enter Address: ");
-                    String address = IOManager.stringInput(50);
+                    profile.setAddress(IOManager.stringInput(50));
                     System.out.print("Enter Phone Number: ");
-                    String phone_number = IOManager.validPhoneNumber(10);
-                    success_value = customer_view.insertCustomer(customer_id, name, social_security, email, zip_code, city, state, address, phone_number, date_of_birth);
+                    profile.setPhoneNumber(IOManager.validPhoneNumber(10));
+                    success_value = profile.insertCustomer(connection);
+                    System.out.print("------------------------: " + success_value + "\n");
                     if (success_value == 1) {
                         try{
                             connection.commit();
@@ -94,7 +97,7 @@ public class Customer_Interface {
                     }
                     System.out.println("DON'T FORGET TO WRITE DOWN YOUR UNIQUE CUSTOMER ID SO YOU DON'T FORGET IT!");
                     System.out.println("YOU'LL NEED THIS TO MAKE FUTURE INQUIRIES ASSOCIATED WITH OUTSTANDING POLICY/CLAIMS!");
-                    System.out.println("YOUR UNIQUE CUSTOMER ID IS: " + customer_id + "\n");
+                    System.out.println("YOUR UNIQUE CUSTOMER ID IS: " + profile.getCustomerId() + "\n");
                 }
                 /**
                  * [2] Add a Policy

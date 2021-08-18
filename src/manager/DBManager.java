@@ -49,6 +49,13 @@ public class DBManager {
             catch (SQLException exception) {}
         }
     }
+
+    public static Connection getConnection() {
+        if (conn == null) {
+            conn = DBManager.connect();
+        }
+        return conn;
+    }
 }
 
 

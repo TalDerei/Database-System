@@ -62,8 +62,10 @@ public class Main {
     }
 }
 
-// split up functions and classes into respective folders/packages
-// look into prepared statemnt caching vs seperating them
 // seperate the functions from CLI
-// create seperate objects 
+// create seperate classes and objects 
+// create getters and setters
+// implement arraylists for retrieving data from database
 // create interface boilerplate
+// tests (don't change database)
+// change to boolean
