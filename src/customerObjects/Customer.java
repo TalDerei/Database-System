@@ -1,13 +1,19 @@
-package objects;
+package customerObjects;
 
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Connection;
+import java.sql.Date;
+import manager.DBManager;
 
-public class Profile {
+public class Customer {
 
-    public static PreparedStatement createCustomer;
+    public static PreparedStatement addCustomer;
+    public static PreparedStatement checkCustomerID;
 
     /**
-     * profile parameters
+     * Customer profile parameters
      */
     private int customer_id;
     private String name;
@@ -21,9 +27,9 @@ public class Profile {
     private String phone_number;
 
     /**
-     * Constructor for creating new Profile objects for the database
+     * Constructor for creating new Profile objects
      */
-    public Profile() {
+    public Customer() {
     }
 
     /**
@@ -39,8 +45,7 @@ public class Profile {
      * @param address
      * @param phone_number
      */
-
-    public Profile(int customer_id, String name, int social_security, String date_of_birth, String email, int zip_code, String city, String state, String address, String phone_number) {
+    public Customer(int customer_id, String name, int social_security, String date_of_birth, String email, int zip_code, String city, String state, String address, String phone_number) {
         this.customer_id = customer_id;
         this.name = name;
         this.social_security = social_security;
@@ -54,12 +59,12 @@ public class Profile {
     }
 
     /**
-     * insertCustomer inserts new customer
+     * Insert new customer profile 
      */
-    public int insertCustomer(Connection conn) {
-        //Connection conn = DBManager.getConnection();
+    public int insertCustomer() {
+        Connection conn = DBManager.getConnection();
         try {
-            Profile.createCustomer = conn.prepareStatement("INSERT INTO customer (CUSTOMER_ID, NAME, SOCIAL_SECURITY, EMAIL, ZIP_CODE, CITY, STATE, ADDRESS, DATE_OF_BIRTH, PHONE_NUMBER) VALUES (?,?,?,?,?,?,?,?,?,?)");
+            Customer.addCustomer = conn.prepareStatement("INSERT INTO customer (CUSTOMER_ID, NAME, SOCIAL_SECURITY, EMAIL, ZIP_CODE, CITY, STATE, ADDRESS, DATE_OF_BIRTH, PHONE_NUMBER) VALUES (?,?,?,?,?,?,?,?,?,?)");
         }
         catch (SQLException exception) {
             System.out.println("Error with Prepared Statements!");
@@ -68,17 +73,17 @@ public class Profile {
         int success = 0;
 
         try {
-            createCustomer.setInt(1, customer_id);
-            createCustomer.setString(2, name);
-            createCustomer.setInt(3, social_security);
-            createCustomer.setString(4, email);
-            createCustomer.setInt(5, zip_code);
-            createCustomer.setString(6, city);
-            createCustomer.setString(7, state);
-            createCustomer.setString(8, address);
-            createCustomer.setDate(9, Date.valueOf(date_of_birth));
-            createCustomer.setString(10, phone_number);
-            success = createCustomer.executeUpdate();
+            addCustomer.setInt(1, customer_id);
+            addCustomer.setString(2, name);
+            addCustomer.setInt(3, social_security);
+            addCustomer.setString(4, email);
+            addCustomer.setInt(5, zip_code);
+            addCustomer.setString(6, city);
+            addCustomer.setString(7, state);
+            addCustomer.setString(8, address);
+            addCustomer.setDate(9, Date.valueOf(date_of_birth));
+            addCustomer.setString(10, phone_number);
+            success = addCustomer.executeUpdate();
         }
         catch (SQLException exception) {
             System.out.println("Failed to Add Customer to Database! Something Went Wrong, Try Again!");
@@ -86,7 +91,43 @@ public class Profile {
         return success;
     }
 
+     /**
+     * Check is customer ID already exists in the database when user attempts to add policy
+     */
+    public int getCustomerID(int customer_id) {
+        Connection conn = DBManager.getConnection();
+        try {
+            Customer.checkCustomerID = conn.prepareStatement("SELECT customer_id FROM customer WHERE customer_id = ?");
+        }
+        catch (SQLException exception) {
+            System.out.println("Error with Prepared Statements!");
+        }
 
+        int id = 0;
+        try {
+            checkCustomerID.setInt(1, customer_id);
+            ResultSet resultset = checkCustomerID.executeQuery();
+            while (resultset.next()) {
+                id = resultset.getInt("customer_id");
+                System.out.println("customer_id is: " + id);
+            }
+            try {
+                resultset.close();
+            }
+            catch (SQLException exception) {
+                System.out.println("Cannot close resultset!");
+            }
+        }
+        catch (SQLException exception) {
+            System.out.println("Customer ID invalid! No customer exists!!");
+        }
+        return id;
+    }
+
+
+    /**
+     *  Getters and Setters
+     */
     public void setCustomerId (int customer_id) {
         this.customer_id = customer_id;
     }

@@ -10,10 +10,14 @@ package interfaces;
 
 import java.sql.*;
 import java.util.Scanner;
+
+import customerObjects.Policy;
+import customerObjects.Customer;
+import customerObjects.Input;
+
 import java.time.LocalDate;
 import java.util.Calendar;
 import manager.IOManager;
-import objects.Profile;
 import views.Customer_View;
 
 /**
@@ -26,7 +30,6 @@ public class Customer_Interface {
      */
     public static void Customer(Connection connection) {
         Customer_View customer_view = new Customer_View();
-        customer_view.prepare(connection);
 
         /**
          * Command-line interface for customer interface
@@ -61,7 +64,7 @@ public class Customer_Interface {
                  * [1] Create a New Customer Profile
                  */
                 if (menue_selection == 1) {
-                    Profile profile = new Profile();
+                    Customer profile = new Customer();
                     profile.setCustomerId(IOManager.idNumber(999999));
                     System.out.print("Enter Customer Name: ");
                     profile.setName(IOManager.stringInputWithoutNumbers(30));
@@ -84,7 +87,7 @@ public class Customer_Interface {
                     profile.setAddress(IOManager.stringInput(50));
                     System.out.print("Enter Phone Number: ");
                     profile.setPhoneNumber(IOManager.validPhoneNumber(10));
-                    success_value = profile.insertCustomer(connection);
+                    success_value = profile.insertCustomer();
                     System.out.print("------------------------: " + success_value + "\n");
                     if (success_value == 1) {
                         try{
@@ -104,7 +107,7 @@ public class Customer_Interface {
                  */
                 else if (menue_selection == 2) {
                     System.out.print("Please Enter an Existing 6-digit Customer ID to Create a New Policy: ");
-                    int customer_id = customer_view.user_integer();
+                    int customer_id = Input.user_integer();
                     success_value = customer_view.getCustomerID(customer_id);
                     if (customer_id == success_value) {
                         while (true) {
@@ -411,10 +414,8 @@ public class Customer_Interface {
                  */
                 else if (menue_selection == 3) {
                     System.out.print("Enter an existing policy ID to drop the policy: ");
-                    int policy_id = customer_view.user_integer();
-                    success_value = customer_view.getPolicyID(policy_id);
-                    if (policy_id == success_value) {
-                        success_value = customer_view.deletePolicy(policy_id);
+                    int policy_id = Input.user_integer();
+                    if ((Policy.getPolicyID(policy_id)) == policy_id && (Policy.dropPolicy(policy_id) == true)) {
                         System.out.println("Successfully Deleted Policy!\n");
                     }
                     else {
@@ -426,8 +427,8 @@ public class Customer_Interface {
                  */
                 else if (menue_selection == 4) {
                     System.out.print("Enter an Existing Policy ID to Start a Claim: ");
-                    int policy_id = customer_view.user_integer();
-                    success_value = customer_view.getPolicyID(policy_id);
+                    int policy_id = Input.user_integer();
+                    success_value = Policy.getPolicyID(policy_id);
                     if (policy_id == success_value) {
                         int claim_id = IOManager.idNumber(999999);
                         String claim_type = IOManager.policyPlan(1);
@@ -466,8 +467,8 @@ public class Customer_Interface {
                  */
                 else if (menue_selection == 5) {
                     System.out.print("Enter Existing Policy ID to Make a Payment: ");
-                    int policy_id = customer_view.user_integer();
-                    success_value = customer_view.getPolicyID(policy_id);
+                    int policy_id = Input.user_integer();
+                    success_value = Policy.getPolicyID(policy_id);
                     if (success_value == policy_id) {
                         int cost = customer_view.getPolicyCost(policy_id);
                         Date[] dates = new Date[2];
@@ -607,8 +608,8 @@ public class Customer_Interface {
                  */
                 else if (menue_selection == 6) {
                     System.out.print("Enter Existing Policy ID to Retrieve Information About the Policy: \n");
-                    int policy_id = customer_view.user_integer();
-                    success_value = customer_view.getPolicyID(policy_id);
+                    int policy_id = Input.user_integer();
+                    success_value = Policy.getPolicyID(policy_id);
                     if (policy_id == success_value) {
                         success_value = customer_view.getPolicyInfo(policy_id);
                         System.out.print("\n");
@@ -622,7 +623,7 @@ public class Customer_Interface {
                  */
                 else if (menue_selection == 7) {
                     System.out.print("Enter Existing Claim ID to Check the Status of the Claim: ");
-                    int claim_id = customer_view.user_integer();
+                    int claim_id = Input.user_integer();
                     success_value = customer_view.getClaimID(claim_id);
                     if (claim_id == success_value) {
                         customer_view.getClaimStatus(claim_id);
@@ -638,8 +639,8 @@ public class Customer_Interface {
                  */
                 else if (menue_selection == 8) {
                     System.out.println("Enter Existing Policy ID to Add a Dependant to the Policy: ");
-                    int policy_id = customer_view.user_integer();
-                    success_value = customer_view.getPolicyID(policy_id);
+                    int policy_id = Input.user_integer();
+                    success_value = Policy.getPolicyID(policy_id);
                     if (policy_id == success_value) {
                         int dependant_id = IOManager.idNumber(999999);
                         System.out.print("Enter Dependant Name: ");
@@ -674,11 +675,11 @@ public class Customer_Interface {
                 else if (menue_selection == 9) {
                     System.out.println("[1] Add Additional Vehicle to Auto Insurance Policy");
                     System.out.println("[2] Delete Vehicle From Policy");
-                    menue_selection = customer_view.user_integer();
+                    menue_selection = Input.user_integer();
                     if (menue_selection == 1) {
                         System.out.print("Enter Existing Auto Insurance Policy: ");
-                        int policy_id = customer_view.user_integer();
-                        success_value = customer_view.getPolicyID(policy_id);
+                        int policy_id = Input.user_integer();
+                        success_value = Policy.getPolicyID(policy_id);
                         if (policy_id == success_value) {
                             int vehicle_id = IOManager.idNumber(999999);
                             String extra_vehicle = "Yes";
@@ -712,7 +713,7 @@ public class Customer_Interface {
                     }
                     else if (menue_selection == 2) {
                         System.out.print("[2] Enter Exising Auto Insuance Policy: ");
-                        int vehicle_id = customer_view.user_integer();
+                        int vehicle_id = Input.user_integer();
                         success_value = customer_view.deleteAdditionalVehicle(vehicle_id);
                         if (success_value == 1) {
                             try{

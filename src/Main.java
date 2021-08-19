@@ -62,10 +62,12 @@ public class Main {
     }
 }
 
-// seperate the functions from CLI
+// create getters and setters and simplify CLI
 // create seperate classes and objects 
-// create getters and setters
 // implement arraylists for retrieving data from database
 // create interface boilerplate
 // tests (don't change database)
 // change to boolean
+// make objects folder explicit 
+// function return types
+// clean open resources like 'input'
