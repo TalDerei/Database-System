@@ -62,12 +62,17 @@ public class Main {
     }
 }
 
-// create getters and setters and simplify CLI
-// create seperate classes and objects 
 // implement arraylists for retrieving data from database
 // create interface boilerplate
 // tests (don't change database)
+
+// remove all the warnings and errors
+// Constructor objects
+// check function descriptions
 // change to boolean
-// make objects folder explicit 
 // function return types
 // clean open resources like 'input'
+// fix policy logic (multiple seperate Connections)
+// create interface boilerplate
+// check functionality of Customer interface
+// push changes to repo

@@ -1,11 +1,3 @@
-/**
- * Course: CSE 341
- * Semester and Year: Spring 2021
- * Assignment: Database Systems
- * Author: Derei, Tal
- * User ID: tad222
- */
-
 package manager;
 
 import java.util.Scanner;

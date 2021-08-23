@@ -1,19 +1,23 @@
-package customerObjects;
+package objects.CustomerObjects;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Calendar;
-
 import manager.DBManager;
-
 import java.sql.Connection;
 
 public class Payment {
+    /**
+     * Prepared Statments 
+     */
     public static PreparedStatement policyPayment;
     public static PreparedStatement addDebitCard;
     public static PreparedStatement addCreditCard;
 
+    /**
+     * Constructor for creating new Payment objects
+     */
     public Payment() {
 
     }
@@ -23,8 +27,15 @@ public class Payment {
     }
 
      /**
-     * payCreditCard makes a credit payment to policy
-     */
+      * Make a credit card payment to policy
+      * @param payment_id
+      * @param type
+      * @param card_number
+      * @param cvv
+      * @param policy_id
+      * @param expiary_date
+      * @return Wether credit card payment is successfull
+      */
     public int payCreditCard(int payment_id, String type, long card_number, int cvv, int policy_id, int expiary_date) {
         Connection conn = DBManager.getConnection();
 
@@ -51,8 +62,15 @@ public class Payment {
         return success;
     }
 
-        /**
-     * payDebitCard makes a debit payment to policy
+    /**
+     * Make a debit card payment to policy
+     * @param payment_id
+     * @param type
+     * @param card_number
+     * @param cvv
+     * @param policy_id
+     * @param expiary_date
+     * @return Whether debit card transaction is successful
      */
     public int payDebitCard(int payment_id, String type, long card_number, int cvv, int policy_id, int expiary_date) {
         Connection conn = DBManager.getConnection();
@@ -81,7 +99,15 @@ public class Payment {
     }
 
     /**
-     * makePolicyPayment allows user to make policy payment
+     * Allow user to make policy payment
+     * @param payment_id
+     * @param policy_id
+     * @param recipient_name
+     * @param recipient_address
+     * @param bank
+     * @param payment_amount
+     * @param status
+     * @return Whether payment is successfull
      */
     public int makePolicyPayment(int payment_id, int policy_id, String recipient_name, String recipient_address, String bank, int payment_amount, String status) {  
         Connection conn = DBManager.getConnection();
@@ -111,8 +137,11 @@ public class Payment {
         return success;
     }
 
-     /**
-     * checkPaymentStatus checks the status of a payment
+    /**
+     * Check the status of a payment
+     * @param calendar
+     * @param localdate
+     * @return Whether payment status is successfull
      */
     public String checkPaymentStatus(Calendar calendar, LocalDate localdate) {
         String status = "";
@@ -128,9 +157,8 @@ public class Payment {
         return status;
     }
 
-    public java.sql.Date currentDate() {
+    public static java.sql.Date currentDate() {
         java.util.Date current = new java.util.Date();
         return new java.sql.Date(current.getTime());
     }
-
 }
